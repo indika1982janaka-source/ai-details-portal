@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ගොවිපළ තොරතුරු පද්ධතිය | Dairy Farm Data Portal</title>
+  <title>ගොවිපළ තොරතුරු පද්ධතිය-ඉබ්බාගමුව පශු වෛද්‍ය කාර්යාලය | Dairy Farm Data Portal</title>
   
   <!-- Tailwind CSS - Open Source UI Framework -->
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
@@ -25,9 +25,9 @@
     <div class="max-w-7xl mx-auto flex items-center justify-between">
       <div class="flex items-center gap-3">
         <img src="https://img.icons8.com/color/48/cow.png" alt="Cow Icon" class="w-10 h-10">
-        <h1 class="text-3xl font-bold text-gray-800">ගොවිපළ තොරතුරු පද්ධතිය</h1>
+        <h1 class="text-2xl md:text-3xl font-bold text-gray-800">ගොවිපළ තොරතුරු පද්ධතිය-ඉබ්බාගමුව පශු වෛද්‍ය කාර්යාලය</h1>
       </div>
-      <p class="text-sm text-gray-500">Data Source: Google Sheet (සජීවීව)</p>
+      <p class="text-sm text-gray-500 hidden md:block">Data Source: Google Sheet (සජීවීව)</p>
     </div>
   </header>
 
@@ -63,7 +63,7 @@
   </main>
 
   <footer class="text-center p-6 text-gray-500 text-sm mt-12 border-t border-gray-200">
-    © 2026 Dairy Farm Data Portal. Built with Open Source Tech.
+    © 2026 Dairy Farm Data Portal - ඉබ්බාගමුව පශු වෛද්‍ය කාර්යාලය. Built with Open Source Tech.
   </footer>
 
   <script>
@@ -95,7 +95,7 @@
       }
     }
 
-    // දත්ත වල ඇති Field නාම නිවැරදිව ලබා ගැනීමට උපකාරී වන Helper Function එකක්
+    // දත්ත වල ඇති Field නාම නිවැරදිව ලබා ගැනීමට උපකාරී වන Function එක
     function getFieldValue(item, keys) {
       for (let key of keys) {
         if (item[key] !== undefined && item[key] !== null && item[key] !== '') {
@@ -116,7 +116,6 @@
         return;
       }
 
-      // Google Sheet එකේ ඇති Column Names වල විය හැකි වෙනස්කම් (Spaces හෝ Underscores) සළකා බැලීම
       const filtered = farmData.filter(item => {
         const farmId = getFieldValue(item, ['Farm_ID', 'Farm ID', 'farm_id', 'farmid']).toString().toLowerCase();
         const farmerName = getFieldValue(item, ['Farmer_Name', 'Farmer Name', 'farmer_name', 'farmername']).toString().toLowerCase();
@@ -145,7 +144,6 @@
         let primaryTitle = '';
         let secondaryTitle = '';
 
-        // පරිශීලකයා ඇතුළත් කළ අගය Farm ID එකට සමාන නම් Farmer Name ප්‍රධාන ලෙස පෙන්වයි, නැතහොත් Farm ID ප්‍රධාන ලෙස පෙන්වයි
         if (farmIdStr.includes(query)) {
           primaryTitle = `<span class="text-gray-500 text-sm block mb-1">Farmer Name:</span> <span class="text-blue-900">${farmerName || '-'}</span>`;
           secondaryTitle = `Farm ID: <span class="font-semibold text-gray-800">${farmId || '-'}</span>`;
