@@ -30,7 +30,7 @@
         <h1 class="text-xl md:text-2xl font-bold text-gray-800">කෘත්‍රිම සිංචන තොරතුරු-ඉබ්බාගමුව පශු වෛද්‍ය කාර්යාලය</h1>
       </div>
 
-      <!-- Top Left / Center Menu Links -->
+      <!-- Navigation Menu Links -->
       <nav class="flex items-center gap-2 bg-gray-50 p-1.5 rounded-xl border border-gray-200">
         <a href="index.html" class="bg-blue-600 text-white font-medium px-4 py-2 rounded-lg text-sm transition shadow-sm">කෘත්‍රිම සිංචන දත්ත</a>
         <a href="report.html" class="text-gray-700 hover:bg-gray-200 font-medium px-4 py-2 rounded-lg text-sm transition">Melsiripura LDI දත්ත</a>
@@ -42,17 +42,32 @@
   <!-- Main Content Area -->
   <main class="max-w-7xl mx-auto p-6">
     
-    <!-- Search Section with Dropdown -->
+    <!-- Search Section with Two Dropdowns -->
     <div class="bg-white p-6 rounded-xl shadow-sm mb-8">
-      <h2 class="text-lg font-semibold text-gray-700 mb-4">ගොවිපල අංකය 6130 සමග අවසන් ඉලක්කම් 4 හෝ ගොවිමහතාගේ නම ඉංග්‍රිසි අකුරෙන් යොදන්න</h2>
-      <div class="flex flex-col md:flex-row gap-4">
-        <!-- Dropdown Select Box -->
-        <select id="searchInput" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white">
-          <option value="">-- ලැයිස්තුවෙන් තෝරන්න --</option>
-        </select>
-        <button onclick="filterData()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-3 rounded-lg flex items-center gap-2 justify-center transition">
-          <img src="https://img.icons8.com/ios-glyphs/30/ffffff/search--v1.png" class="w-5 h-5"/>
-          සොයන්න
+      <h2 class="text-lg font-semibold text-gray-700 mb-4">ගොවිපල අංකය හෝ ගොවිමහතාගේ නම අනුව සෙවුම් කරන්න</h2>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <!-- Farm ID Dropdown -->
+        <div>
+          <label class="block text-sm font-medium text-gray-600 mb-1">ගොවිපල අංකය (Farm ID - 6130...):</label>
+          <select id="farmIdDropdown" onchange="onFarmIdSelect()" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white">
+            <option value="">-- Farm ID එකක් තෝරන්න --</option>
+          </select>
+        </div>
+
+        <!-- Farmer Name Dropdown -->
+        <div>
+          <label class="block text-sm font-medium text-gray-600 mb-1">ගොවිමහතාගේ නම (Farmer Name):</label>
+          <select id="farmerNameDropdown" onchange="onFarmerNameSelect()" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white">
+            <option value="">-- නමක් තෝරන්න --</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Reset / Clear Button -->
+      <div class="flex justify-end">
+        <button onclick="resetSearch()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium px-6 py-2 rounded-lg text-sm transition">
+          නැවත සකසන්න (Reset)
         </button>
       </div>
     </div>
@@ -67,7 +82,7 @@
     <div id="resultsContainer" class="space-y-6">
       <div class="text-center p-16 bg-white rounded-xl shadow-inner text-gray-500">
         <img src="https://img.icons8.com/isometric/100/search-property.png" alt="Search Property Icon" class="mx-auto mb-4"/>
-        සෙවුම් කිරීමට ලැයිස්තුවෙන් අංකය හෝ නම තෝරා 'සොයන්න' ක්ලික් කරන්න.
+        ඉහත ලැයිස්තු වලින් Farm ID එකක් හෝ Farmer Name එකක් තෝරන්න.
       </div>
     </div>
 
@@ -92,7 +107,7 @@
         const res = await fetch(API_URL);
         farmData = await res.json();
         console.log("Loaded Farm Data successfully:", farmData);
-        populateDropdown();
+        populateDropdowns();
       } catch (error) {
         console.error("Error loading data:", error);
         document.getElementById('resultsContainer').innerHTML = `
@@ -115,43 +130,72 @@
       return '';
     }
 
-    function populateDropdown() {
-      const selectElement = document.getElementById('searchInput');
-      let optionsSet = new Set();
+    // Dropdowns දෙක Populate කිරීම
+    function populateDropdowns() {
+      const farmIdSelect = document.getElementById('farmIdDropdown');
+      const farmerNameSelect = document.getElementById('farmerNameDropdown');
+      
+      let farmIdsSet = new Set();
+      let farmerNamesSet = new Set();
 
       farmData.forEach(item => {
         const farmId = getFieldValue(item, ['Farm_ID', 'Farm ID', 'farm_id', 'farmid']);
         const farmerName = getFieldValue(item, ['Farmer_Name', 'Farmer Name', 'farmer_name', 'farmername']);
 
-        if (farmId) optionsSet.add(farmId.toString());
-        if (farmerName) optionsSet.add(farmerName.toString());
+        if (farmId) farmIdsSet.add(farmId.toString());
+        if (farmerName) farmerNamesSet.add(farmerName.toString());
       });      
 
-      let sortedOptions = Array.from(optionsSet).sort();
+      let sortedFarmIds = Array.from(farmIdsSet).sort();
+      let sortedFarmerNames = Array.from(farmerNamesSet).sort();
 
-      sortedOptions.forEach(optionValue => {
+      sortedFarmIds.forEach(id => {
         let opt = document.createElement('option');
-        opt.value = optionValue.toLowerCase();
-        opt.textContent = optionValue;
-        selectElement.appendChild(opt);
+        opt.value = id.toLowerCase();
+        opt.textContent = id;
+        farmIdSelect.appendChild(opt);
+      });
+
+      sortedFarmerNames.forEach(name => {
+        let opt = document.createElement('option');
+        opt.value = name.toLowerCase();
+        opt.textContent = name;
+        farmerNameSelect.appendChild(opt);
       });
     }
 
-    function filterData() {
-      const query = document.getElementById('searchInput').value.trim();
+    // Farm ID Dropdown එකෙන් තෝරන විට
+    function onFarmIdSelect() {
+      const farmIdVal = document.getElementById('farmIdDropdown').value;
+      if (farmIdVal) {
+        document.getElementById('farmerNameDropdown').value = ""; // අනෙක් එක Reset කරයි
+        displayResults('farm_id', farmIdVal);
+      }
+    }
+
+    // Farmer Name Dropdown එකෙන් තෝරන විට
+    function onFarmerNameSelect() {
+      const farmerNameVal = document.getElementById('farmerNameDropdown').value;
+      if (farmerNameVal) {
+        document.getElementById('farmIdDropdown').value = ""; // අනෙක් එක Reset කරයි
+        displayResults('farmer_name', farmerNameVal);
+      }
+    }
+
+    // ප්‍රතිඵල පෙන්වන ප්‍රධාන Function එක
+    function displayResults(type, query) {
       const container = document.getElementById('resultsContainer');
       container.innerHTML = '';
-
-      if (!query) {
-        container.innerHTML = `<p class="text-center p-12 text-gray-500">කරුණාකර ලැයිස්තුවෙන් ගොවිපළක් හෝ ගොවිමහතෙක් තෝරන්න.</p>`;
-        return;
-      }
 
       const filtered = farmData.filter(item => {
         const farmId = getFieldValue(item, ['Farm_ID', 'Farm ID', 'farm_id', 'farmid']).toString().toLowerCase();
         const farmerName = getFieldValue(item, ['Farmer_Name', 'Farmer Name', 'farmer_name', 'farmername']).toString().toLowerCase();
         
-        return farmId === query || farmerName === query;
+        if (type === 'farm_id') {
+          return farmId === query;
+        } else {
+          return farmerName === query;
+        }
       });
 
       if (filtered.length === 0) {
@@ -170,23 +214,12 @@
         const address = getFieldValue(item, ['Address', 'address']);
         const contactNo = getFieldValue(item, ['Contact_no', 'Contact No', 'contact_no', 'phone']);
         
-        let primaryTitle = '';
-        let secondaryTitle = '';
-
-        if (farmId.toString().toLowerCase() === query) {
-          primaryTitle = `<span class="text-gray-500 text-sm block mb-1">Farmer Name:</span> <span class="text-blue-900">${farmerName || '-'}</span>`;
-          secondaryTitle = `Farm ID: <span class="font-semibold text-gray-800">${farmId || '-'}</span>`;
-        } else {
-          primaryTitle = `<span class="text-gray-500 text-sm block mb-1">Farm ID:</span> <span class="text-blue-900">${farmId || '-'}</span>`;
-          secondaryTitle = `Farmer Name: <span class="font-semibold text-gray-800">${farmerName || '-'}</span>`;
-        }
-
         const card = `
           <div class="data-card bg-white p-6 rounded-xl shadow-sm border border-gray-100">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4 border-b border-gray-200 pb-4">
               <div>
-                <h2 class="text-2xl font-bold">${primaryTitle}</h2>
-                <p class="text-lg text-gray-600 mt-1">${secondaryTitle}</p>
+                <h2 class="text-2xl font-bold text-blue-900">${farmerName || '-'}</h2>
+                <p class="text-lg text-gray-600 mt-1">Farm ID: <span class="font-semibold text-gray-800">${farmId || '-'}</span></p>
               </div>
               <div class="text-left md:text-right text-gray-600 bg-gray-50 p-3 rounded-lg border border-gray-100">
                 <p><strong>Address:</strong> ${address || '-'}</p>
@@ -215,6 +248,18 @@
         `;
         container.innerHTML += card;
       });
+    }
+
+    // Reset කිරීම
+    function resetSearch() {
+      document.getElementById('farmIdDropdown').value = "";
+      document.getElementById('farmerNameDropdown').value = "";
+      document.getElementById('resultsContainer').innerHTML = `
+        <div class="text-center p-16 bg-white rounded-xl shadow-inner text-gray-500">
+          <img src="https://img.icons8.com/isometric/100/search-property.png" alt="Search Property Icon" class="mx-auto mb-4"/>
+          ඉහත ලැයිස්තු වලින් Farm ID එකක් හෝ Farmer Name එකක් තෝරන්න.
+        </div>
+      `;
     }
 
     loadData();
