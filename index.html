@@ -20,14 +20,22 @@
 </head>
 <body class="bg-gray-100 min-h-screen">
 
-  <!-- Header -->
+  <!-- Header with Navigation Menu on Top Left -->
   <header class="bg-white shadow-md p-4">
-    <div class="max-w-7xl mx-auto flex items-center justify-between">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+      
+      <!-- Logo and Title -->
       <div class="flex items-center gap-3">
         <img src="https://img.icons8.com/color/48/cow.png" alt="Cow Icon" class="w-10 h-10">
         <h1 class="text-xl md:text-2xl font-bold text-gray-800">කෘත්‍රිම සිංචන තොරතුරු-ඉබ්බාගමුව පශු වෛද්‍ය කාර්යාලය</h1>
       </div>
-      <p class="text-sm text-gray-500 hidden md:block">Data Source: Google Sheet (සජීවීව)</p>
+
+      <!-- Top Left / Center Menu Links -->
+      <nav class="flex items-center gap-2 bg-gray-50 p-1.5 rounded-xl border border-gray-200">
+        <a href="index.html" class="bg-blue-600 text-white font-medium px-4 py-2 rounded-lg text-sm transition shadow-sm">කෘත්‍රිම සිංචන දත්ත</a>
+        <a href="report.html" class="text-gray-700 hover:bg-gray-200 font-medium px-4 py-2 rounded-lg text-sm transition">Melsiripura LDI දත්ත</a>
+      </nav>
+
     </div>
   </header>
 
@@ -76,7 +84,6 @@
 
     let farmData = [];
 
-    // API එකෙන් Data Fetch කර ගැනීම සහ Dropdown එක Populate කිරීම
     async function loadData() {
       const loading = document.getElementById('loadingIndicator');
       loading.classList.remove('hidden');
@@ -85,9 +92,7 @@
         const res = await fetch(API_URL);
         farmData = await res.json();
         console.log("Loaded Farm Data successfully:", farmData);
-
         populateDropdown();
-
       } catch (error) {
         console.error("Error loading data:", error);
         document.getElementById('resultsContainer').innerHTML = `
@@ -101,7 +106,6 @@
       }
     }
 
-    // දත්ත වල ඇති Field නාම නිවැරදිව ලබා ගැනීමට උපකාරී වන Function එක
     function getFieldValue(item, keys) {
       for (let key of keys) {
         if (item[key] !== undefined && item[key] !== null && item[key] !== '') {
@@ -111,7 +115,6 @@
       return '';
     }
 
-    // Dropdown එකට Farm ID සහ Farmer Name ඇතුළත් කිරීම
     function populateDropdown() {
       const selectElement = document.getElementById('searchInput');
       let optionsSet = new Set();
@@ -120,12 +123,8 @@
         const farmId = getFieldValue(item, ['Farm_ID', 'Farm ID', 'farm_id', 'farmid']);
         const farmerName = getFieldValue(item, ['Farmer_Name', 'Farmer Name', 'farmer_name', 'farmername']);
 
-        if (farmId) {
-          optionsSet.add(farmId.toString());
-        }
-        if (farmerName) {
-          optionsSet.add(farmerName.toString());
-        }
+        if (farmId) optionsSet.add(farmId.toString());
+        if (farmerName) optionsSet.add(farmerName.toString());
       });      
 
       let sortedOptions = Array.from(optionsSet).sort();
@@ -138,7 +137,6 @@
       });
     }
 
-    // Filter කිරීමේ ප්‍රධාන Function එක
     function filterData() {
       const query = document.getElementById('searchInput').value.trim();
       const container = document.getElementById('resultsContainer');
