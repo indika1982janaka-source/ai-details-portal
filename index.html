@@ -81,7 +81,7 @@
       try {
         const res = await fetch(API_URL);
         farmData = await res.json();
-        console.log("Data Loaded:", farmData);
+        console.log("Loaded Farm Data successfully:", farmData);
       } catch (error) {
         console.error("Error loading data:", error);
         document.getElementById('resultsContainer').innerHTML = `
@@ -95,6 +95,16 @@
       }
     }
 
+    // දත්ත වල ඇති Field නාම නිවැරදිව ලබා ගැනීමට උපකාරී වන Helper Function එකක්
+    function getFieldValue(item, keys) {
+      for (let key of keys) {
+        if (item[key] !== undefined && item[key] !== null && item[key] !== '') {
+          return item[key];
+        }
+      }
+      return '';
+    }
+
     // Filter කිරීමේ ප්‍රධාන Function එක
     function filterData() {
       const query = document.getElementById('searchInput').value.toLowerCase().trim();
@@ -106,10 +116,13 @@
         return;
       }
 
-      const filtered = farmData.filter(item => 
-        (item['Farm_ID'] && item['Farm_ID'].toString().toLowerCase().includes(query)) ||
-        (item['Farmer_Name'] && item['Farmer_Name'].toString().toLowerCase().includes(query))
-      );
+      // Google Sheet එකේ ඇති Column Names වල විය හැකි වෙනස්කම් (Spaces හෝ Underscores) සළකා බැලීම
+      const filtered = farmData.filter(item => {
+        const farmId = getFieldValue(item, ['Farm_ID', 'Farm ID', 'farm_id', 'farmid']).toString().toLowerCase();
+        const farmerName = getFieldValue(item, ['Farmer_Name', 'Farmer Name', 'farmer_name', 'farmername']).toString().toLowerCase();
+        
+        return farmId.includes(query) || farmerName.includes(query);
+      });
 
       if (filtered.length === 0) {
         container.innerHTML = `
@@ -122,18 +135,23 @@
       }
 
       filtered.forEach(item => {
-        const farmIdStr = (item['Farm_ID'] || '').toString().toLowerCase();
+        const farmId = getFieldValue(item, ['Farm_ID', 'Farm ID', 'farm_id', 'farmid']);
+        const farmerName = getFieldValue(item, ['Farmer_Name', 'Farmer Name', 'farmer_name', 'farmername']);
+        const address = getFieldValue(item, ['Address', 'address']);
+        const contactNo = getFieldValue(item, ['Contact_no', 'Contact No', 'contact_no', 'phone']);
+        
+        const farmIdStr = farmId.toString().toLowerCase();
         
         let primaryTitle = '';
         let secondaryTitle = '';
 
-        // Farm ID යෙදූ විට Farmer Name පෙනෙන සේ සහ Farmer Name යෙදූ විට Farm ID පෙනෙන සේ
+        // පරිශීලකයා ඇතුළත් කළ අගය Farm ID එකට සමාන නම් Farmer Name ප්‍රධාන ලෙස පෙන්වයි, නැතහොත් Farm ID ප්‍රධාන ලෙස පෙන්වයි
         if (farmIdStr.includes(query)) {
-          primaryTitle = `<span class="text-gray-500 text-sm block mb-1">Farmer Name:</span> <span class="text-blue-900">${item['Farmer_Name'] || '-'}</span>`;
-          secondaryTitle = `Farm ID: <span class="font-semibold text-gray-800">${item['Farm_ID'] || '-'}</span>`;
+          primaryTitle = `<span class="text-gray-500 text-sm block mb-1">Farmer Name:</span> <span class="text-blue-900">${farmerName || '-'}</span>`;
+          secondaryTitle = `Farm ID: <span class="font-semibold text-gray-800">${farmId || '-'}</span>`;
         } else {
-          primaryTitle = `<span class="text-gray-500 text-sm block mb-1">Farm ID:</span> <span class="text-blue-900">${item['Farm_ID'] || '-'}</span>`;
-          secondaryTitle = `Farmer Name: <span class="font-semibold text-gray-800">${item['Farmer_Name'] || '-'}</span>`;
+          primaryTitle = `<span class="text-gray-500 text-sm block mb-1">Farm ID:</span> <span class="text-blue-900">${farmId || '-'}</span>`;
+          secondaryTitle = `Farmer Name: <span class="font-semibold text-gray-800">${farmerName || '-'}</span>`;
         }
 
         const card = `
@@ -144,29 +162,29 @@
                 <p class="text-lg text-gray-600 mt-1">${secondaryTitle}</p>
               </div>
               <div class="text-left md:text-right text-gray-600 bg-gray-50 p-3 rounded-lg border border-gray-100">
-                <p><strong>ලිපිනය:</strong> ${item['Address'] || '-'}</p>
-                <p><strong>දුරකථන:</strong> ${item['Contact_no'] || '-'}</p>
+                <p><strong>ලිපිනය:</strong> ${address || '-'}</p>
+                <p><strong>දුරකථන:</strong> ${contactNo || '-'}</p>
               </div>
             </div>
 
-            <!-- Detailed Grid (Milk Centre, BCS, Total Daily MP ඉවත් කර ඇත) -->
+            <!-- Detailed Grid -->
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-3 text-sm">
-              <p><strong>Date:</strong> ${item['Date'] || '-'}</p>
-              <p><strong>Cow ID:</strong> ${item['Cow_ID'] || '-'}</p>
-              <p><strong>Cow Name:</strong> ${item['Cow_Name'] || '-'}</p>
-              <p><strong>Pregnancy:</strong> ${item['Pregnancy'] || '-'}</p>
-              <p><strong>Date to be calved:</strong> ${item['Date_to_be_calved'] || '-'}</p>
-              <p><strong>Milk Production:</strong> ${item['Milk_Production'] || '-'} L</p>
-              <p><strong>Next Heat:</strong> ${item['Next_Heat'] || '-'}</p>
-              <p><strong>Calve Name/ID:</strong> ${item['Calve_name'] || '-'} (${item['Calve_ID'] || '-'})</p>
-              <p><strong>Semen Code:</strong> ${item['Semen_code'] || '-'}</p>
-              <p><strong>Receipt no:</strong> ${item['Receipt_no'] || '-'}</p>
+              <p><strong>Date:</strong> ${getFieldValue(item, ['Date', 'date']) || '-'}</p>
+              <p><strong>Cow ID:</strong> ${getFieldValue(item, ['Cow_ID', 'Cow ID', 'cow_id']) || '-'}</p>
+              <p><strong>Cow Name:</strong> ${getFieldValue(item, ['Cow_Name', 'Cow Name', 'cow_name']) || '-'}</p>
+              <p><strong>Pregnancy:</strong> ${getFieldValue(item, ['Pregnancy', 'pregnancy']) || '-'}</p>
+              <p><strong>Date to be calved:</strong> ${getFieldValue(item, ['Date_to_be_calved', 'Date to be calved', 'date_to_be_calved']) || '-'}</p>
+              <p><strong>Milk Production:</strong> ${getFieldValue(item, ['Milk_Production', 'Milk Production', 'milk_production']) || '-'} L</p>
+              <p><strong>Next Heat:</strong> ${getFieldValue(item, ['Next_Heat', 'Next Heat', 'next_heat']) || '-'}</p>
+              <p><strong>Calve Name/ID:</strong> ${getFieldValue(item, ['Calve_name', 'Calve Name', 'calve_name']) || '-'} (${getFieldValue(item, ['Calve_ID', 'Calve ID', 'calve_id']) || '-'})</p>
+              <p><strong>Semen Code:</strong> ${getFieldValue(item, ['Semen_code', 'Semen Code', 'semen_code']) || '-'}</p>
+              <p><strong>Receipt no:</strong> ${getFieldValue(item, ['Receipt_no', 'Receipt No', 'receipt_no']) || '-'}</p>
             </div>
             
             <!-- File/Photo Links -->
             <div class="mt-6 pt-4 border-t border-gray-100 flex flex-wrap gap-4 text-sm">
-              ${item['Semen_deposit_photo'] ? `<a href="${item['Semen_deposit_photo']}" target="_blank" class="bg-blue-50 text-blue-700 font-medium px-4 py-2 rounded-full hover:bg-blue-100 transition">Semen Deposit Photo බලන්න →</a>` : ''}
-              ${item['pdf'] ? `<a href="${item['pdf']}" target="_blank" class="bg-green-50 text-green-700 font-medium px-4 py-2 rounded-full hover:bg-green-100 transition">PDF Document එක බලන්න →</a>` : ''}
+              ${getFieldValue(item, ['Semen_deposit_photo', 'Semen Deposit Photo', 'semen_deposit_photo']) ? `<a href="${getFieldValue(item, ['Semen_deposit_photo', 'Semen Deposit Photo', 'semen_deposit_photo'])}" target="_blank" class="bg-blue-50 text-blue-700 font-medium px-4 py-2 rounded-full hover:bg-blue-100 transition">Semen Deposit Photo බලන්න →</a>` : ''}
+              ${getFieldValue(item, ['pdf', 'PDF']) ? `<a href="${getFieldValue(item, ['pdf', 'PDF'])}" target="_blank" class="bg-green-50 text-green-700 font-medium px-4 py-2 rounded-full hover:bg-green-100 transition">PDF Document එක බලන්න →</a>` : ''}
             </div>
           </div>
         `;
