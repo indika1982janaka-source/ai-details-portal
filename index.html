@@ -145,7 +145,8 @@
 
       farmData.forEach(item => {
         const farmId = getFieldValue(item, ['Farm_ID', 'Farm ID', 'farm_id', 'farmid']);
-        const farmerName = getFieldValue(item, ['Farmer_Name', 'Farmer Name', 'farmer_name', 'farmername']);
+        // Google Sheet හි 'Famer Name' ලෙස ඇති බැවින් එය මුලින්ම පරීක්ෂා කරයි
+        const farmerName = getFieldValue(item, ['Famer_Name', 'Famer Name', 'famer_name', 'famername', 'Farmer_Name', 'Farmer Name']);
 
         if (farmId) farmIdsSet.add(farmId.toString());
         if (farmerName) farmerNamesSet.add(farmerName.toString().trim());
@@ -171,9 +172,18 @@
     function onFarmIdInput() {
       const farmIdVal = document.getElementById('farmIdInput').value.trim();
       if (farmIdVal) {
-        document.getElementById('farmerNameInput').value = ""; // අනෙක් එක Reset කරයි
+        const matchedItem = farmData.find(item => {
+          const fId = getFieldValue(item, ['Farm_ID', 'Farm ID', 'farm_id', 'farmid']).toString().toLowerCase();
+          return fId === farmIdVal.toLowerCase();
+        });
+        if (matchedItem) {
+          const fName = getFieldValue(matchedItem, ['Famer_Name', 'Famer Name', 'famer_name', 'famername', 'Farmer_Name', 'Farmer Name']);
+          document.getElementById('farmerNameInput').value = fName;
+        }
+
         displayResults('farm_id', farmIdVal.toLowerCase());
       } else {
+        document.getElementById('farmerNameInput').value = "";
         resetResultsIfEmpty();
       }
     }
@@ -182,9 +192,18 @@
     function onFarmerNameInput() {
       const farmerNameVal = document.getElementById('farmerNameInput').value.trim();
       if (farmerNameVal) {
-        document.getElementById('farmIdInput').value = ""; // අනෙක් එක Reset කරයි
+        const matchedItem = farmData.find(item => {
+          const fName = getFieldValue(item, ['Famer_Name', 'Famer Name', 'famer_name', 'famername', 'Farmer_Name', 'Farmer Name']).toString().trim().toLowerCase();
+          return fName === farmerNameVal.toLowerCase();
+        });
+        if (matchedItem) {
+          const fId = getFieldValue(matchedItem, ['Farm_ID', 'Farm ID', 'farm_id', 'farmid']);
+          document.getElementById('farmIdInput').value = fId;
+        }
+
         displayResults('farmer_name', farmerNameVal.toLowerCase());
       } else {
+        document.getElementById('farmIdInput').value = "";
         resetResultsIfEmpty();
       }
     }
@@ -196,12 +215,12 @@
 
       const filtered = farmData.filter(item => {
         const farmId = getFieldValue(item, ['Farm_ID', 'Farm ID', 'farm_id', 'farmid']).toString().toLowerCase();
-        const farmerName = getFieldValue(item, ['Farmer_Name', 'Farmer Name', 'farmer_name', 'farmername']).toString().trim().toLowerCase();
+        const farmerName = getFieldValue(item, ['Famer_Name', 'Famer Name', 'famer_name', 'famername', 'Farmer_Name', 'Farmer Name']).toString().trim().toLowerCase();
         
         if (type === 'farm_id') {
-          return farmId.includes(query);
+          return farmId === query;
         } else {
-          return farmerName.includes(query);
+          return farmerName === query;
         }
       });
 
@@ -217,7 +236,7 @@
 
       filtered.forEach(item => {
         const farmId = getFieldValue(item, ['Farm_ID', 'Farm ID', 'farm_id', 'farmid']);
-        const farmerName = getFieldValue(item, ['Farmer_Name', 'Farmer Name', 'farmer_name', 'farmername']);
+        const farmerName = getFieldValue(item, ['Famer_Name', 'Famer Name', 'famer_name', 'famername', 'Farmer_Name', 'Farmer Name']);
         const address = getFieldValue(item, ['Address', 'address']);
         const contactNo = getFieldValue(item, ['Contact_no', 'Contact No', 'contact_no', 'phone']);
         
@@ -265,15 +284,3 @@
         </div>
       `;
     }
-
-    // Reset කිරීම
-    function resetSearch() {
-      document.getElementById('farmIdInput').value = "";
-      document.getElementById('farmerNameInput').value = "";
-      resetResultsIfEmpty();
-    }
-
-    loadData();
-  </script>
-</body>
-</html>
