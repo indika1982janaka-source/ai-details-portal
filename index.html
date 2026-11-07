@@ -145,7 +145,6 @@
 
       farmData.forEach(item => {
         const farmId = getFieldValue(item, ['Farm_ID', 'Farm ID', 'farm_id', 'farmid']);
-        // Google Sheet හි 'Famer Name' ලෙස ඇති බැවින් එය මුලින්ම පරීක්ෂා කරයි
         const farmerName = getFieldValue(item, ['Famer_Name', 'Famer Name', 'famer_name', 'famername', 'Farmer_Name', 'Farmer Name']);
 
         if (farmId) farmIdsSet.add(farmId.toString());
@@ -208,7 +207,7 @@
       }
     }
 
-    // ප්‍රතිඵල පෙන්වන ප්‍රධාන Function එක
+    // ප්‍රතිඵල පෙන්වන ප්‍රධාන Function එක (නම හෝ අංකය අර්ධ වශයෙන් ටයිප් කළද ක්‍රියාත්මක වීමට සකසා ඇත)
     function displayResults(type, query) {
       const container = document.getElementById('resultsContainer');
       container.innerHTML = '';
@@ -218,9 +217,9 @@
         const farmerName = getFieldValue(item, ['Famer_Name', 'Famer Name', 'famer_name', 'famername', 'Farmer_Name', 'Farmer Name']).toString().trim().toLowerCase();
         
         if (type === 'farm_id') {
-          return farmId === query;
+          return farmId.includes(query);
         } else {
-          return farmerName === query;
+          return farmerName.includes(query);
         }
       });
 
@@ -284,3 +283,15 @@
         </div>
       `;
     }
+
+    // Reset කිරීම
+    function resetSearch() {
+      document.getElementById('farmIdInput').value = "";
+      document.getElementById('farmerNameInput').value = "";
+      resetResultsIfEmpty();
+    }
+
+    loadData();
+  </script>
+</body>
+</html>
