@@ -135,6 +135,10 @@
       const farmIdSelect = document.getElementById('farmIdDropdown');
       const farmerNameSelect = document.getElementById('farmerNameDropdown');
       
+      // කලින් තිබූ අගයන් හිස් කිරීම (Duplicate වීම වැළැක්වීමට)
+      farmIdSelect.innerHTML = '<option value="">-- Farm ID එකක් තෝරන්න --</option>';
+      farmerNameSelect.innerHTML = '<option value="">-- නමක් තෝරන්න --</option>';
+      
       let farmIdsSet = new Set();
       let farmerNamesSet = new Set();
 
@@ -143,7 +147,7 @@
         const farmerName = getFieldValue(item, ['Farmer_Name', 'Farmer Name', 'farmer_name', 'farmername']);
 
         if (farmId) farmIdsSet.add(farmId.toString());
-        if (farmerName) farmerNamesSet.add(farmerName.toString());
+        if (farmerName) farmerNamesSet.add(farmerName.toString().trim());
       });      
 
       let sortedFarmIds = Array.from(farmIdsSet).sort();
@@ -189,7 +193,7 @@
 
       const filtered = farmData.filter(item => {
         const farmId = getFieldValue(item, ['Farm_ID', 'Farm ID', 'farm_id', 'farmid']).toString().toLowerCase();
-        const farmerName = getFieldValue(item, ['Farmer_Name', 'Farmer Name', 'farmer_name', 'farmername']).toString().toLowerCase();
+        const farmerName = getFieldValue(item, ['Farmer_Name', 'Farmer Name', 'farmer_name', 'farmername']).toString().trim().toLowerCase();
         
         if (type === 'farm_id') {
           return farmId === query;
@@ -215,7 +219,7 @@
         const contactNo = getFieldValue(item, ['Contact_no', 'Contact No', 'contact_no', 'phone']);
         
         const card = `
-          <div class="data-card bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+          <div class="data-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-4">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4 border-b border-gray-200 pb-4">
               <div>
                 <h2 class="text-2xl font-bold text-blue-900">${farmerName || '-'}</h2>
@@ -227,7 +231,7 @@
               </div>
             </div>
 
-            <!-- Detailed Grid (Requested Fields Only) -->
+            <!-- Detailed Grid -->
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-3 text-sm">
               <p><strong>Date:</strong> ${getFieldValue(item, ['Date', 'date']) || '-'}</p>
               <p><strong>Cow ID:</strong> ${getFieldValue(item, ['Cow_ID', 'Cow ID', 'cow_id']) || '-'}</p>
