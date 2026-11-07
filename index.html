@@ -42,25 +42,27 @@
   <!-- Main Content Area -->
   <main class="max-w-7xl mx-auto p-6">
     
-    <!-- Search Section with Two Dropdowns -->
+    <!-- Search Section with Two Typeable Inputs -->
     <div class="bg-white p-6 rounded-xl shadow-sm mb-8">
-      <h2 class="text-lg font-semibold text-gray-700 mb-4">ගොවිපල අංකය හෝ ගොවිමහතාගේ නම අනුව සෙවුම් කරන්න</h2>
+      <h2 class="text-lg font-semibold text-gray-700 mb-4">ගොවිපල අංකය හෝ ගොවිමහතාගේ නම ටයිප් කරන්න හෝ තෝරන්න</h2>
       
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-        <!-- Farm ID Dropdown -->
+        <!-- Farm ID Input with Datalist -->
         <div>
           <label class="block text-sm font-medium text-gray-600 mb-1">ගොවිපල අංකය (Farm ID - 6130...):</label>
-          <select id="farmIdDropdown" onchange="onFarmIdSelect()" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white">
-            <option value="">-- Farm ID එකක් තෝරන්න --</option>
-          </select>
+          <input type="text" id="farmIdInput" list="farmIdOptions" placeholder="Farm ID එක ටයිප් කරන්න..." oninput="onFarmIdInput()" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white">
+          <datalist id="farmIdOptions">
+            <!-- JavaScript හරහා දත්ත මෙහි පිරවේ -->
+          </datalist>
         </div>
 
-        <!-- Farmer Name Dropdown -->
+        <!-- Farmer Name Input with Datalist -->
         <div>
           <label class="block text-sm font-medium text-gray-600 mb-1">ගොවිමහතාගේ නම (Farmer Name):</label>
-          <select id="farmerNameDropdown" onchange="onFarmerNameSelect()" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white">
-            <option value="">-- නමක් තෝරන්න --</option>
-          </select>
+          <input type="text" id="farmerNameInput" list="farmerNameOptions" placeholder="නම ටයිප් කරන්න..." oninput="onFarmerNameInput()" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white">
+          <datalist id="farmerNameOptions">
+            <!-- JavaScript හරහා දත්ත මෙහි පිරවේ -->
+          </datalist>
         </div>
       </div>
 
@@ -82,7 +84,7 @@
     <div id="resultsContainer" class="space-y-6">
       <div class="text-center p-16 bg-white rounded-xl shadow-inner text-gray-500">
         <img src="https://img.icons8.com/isometric/100/search-property.png" alt="Search Property Icon" class="mx-auto mb-4"/>
-        ඉහත ලැයිස්තු වලින් Farm ID එකක් හෝ Farmer Name එකක් තෝරන්න.
+        ඉහත කොටුවලට Farm ID එකක් හෝ ගොවිමහතාගේ නම ටයිප් කරන්න හෝ තෝරන්න.
       </div>
     </div>
 
@@ -107,7 +109,7 @@
         const res = await fetch(API_URL);
         farmData = await res.json();
         console.log("Loaded Farm Data successfully:", farmData);
-        populateDropdowns();
+        populateDatalists();
       } catch (error) {
         console.error("Error loading data:", error);
         document.getElementById('resultsContainer').innerHTML = `
@@ -130,14 +132,13 @@
       return '';
     }
 
-    // Dropdowns දෙක Populate කිරීම
-    function populateDropdowns() {
-      const farmIdSelect = document.getElementById('farmIdDropdown');
-      const farmerNameSelect = document.getElementById('farmerNameDropdown');
+    // Datalist වලට දත්ත පිරවීම
+    function populateDatalists() {
+      const farmIdList = document.getElementById('farmIdOptions');
+      const farmerNameList = document.getElementById('farmerNameOptions');
       
-      // කලින් තිබූ අගයන් හිස් කිරීම (Duplicate වීම වැළැක්වීමට)
-      farmIdSelect.innerHTML = '<option value="">-- Farm ID එකක් තෝරන්න --</option>';
-      farmerNameSelect.innerHTML = '<option value="">-- නමක් තෝරන්න --</option>';
+      farmIdList.innerHTML = '';
+      farmerNameList.innerHTML = '';
       
       let farmIdsSet = new Set();
       let farmerNamesSet = new Set();
@@ -155,34 +156,36 @@
 
       sortedFarmIds.forEach(id => {
         let opt = document.createElement('option');
-        opt.value = id.toLowerCase();
-        opt.textContent = id;
-        farmIdSelect.appendChild(opt);
+        opt.value = id;
+        farmIdList.appendChild(opt);
       });
 
       sortedFarmerNames.forEach(name => {
         let opt = document.createElement('option');
-        opt.value = name.toLowerCase();
-        opt.textContent = name;
-        farmerNameSelect.appendChild(opt);
+        opt.value = name;
+        farmerNameList.appendChild(opt);
       });
     }
 
-    // Farm ID Dropdown එකෙන් තෝරන විට
-    function onFarmIdSelect() {
-      const farmIdVal = document.getElementById('farmIdDropdown').value;
+    // Farm ID Input එක වෙනස් වන විට
+    function onFarmIdInput() {
+      const farmIdVal = document.getElementById('farmIdInput').value.trim();
       if (farmIdVal) {
-        document.getElementById('farmerNameDropdown').value = ""; // අනෙක් එක Reset කරයි
-        displayResults('farm_id', farmIdVal);
+        document.getElementById('farmerNameInput').value = ""; // අනෙක් එක Reset කරයි
+        displayResults('farm_id', farmIdVal.toLowerCase());
+      } else {
+        resetResultsIfEmpty();
       }
     }
 
-    // Farmer Name Dropdown එකෙන් තෝරන විට
-    function onFarmerNameSelect() {
-      const farmerNameVal = document.getElementById('farmerNameDropdown').value;
+    // Farmer Name Input එක වෙනස් වන විට
+    function onFarmerNameInput() {
+      const farmerNameVal = document.getElementById('farmerNameInput').value.trim();
       if (farmerNameVal) {
-        document.getElementById('farmIdDropdown').value = ""; // අනෙක් එක Reset කරයි
-        displayResults('farmer_name', farmerNameVal);
+        document.getElementById('farmIdInput').value = ""; // අනෙක් එක Reset කරයි
+        displayResults('farmer_name', farmerNameVal.toLowerCase());
+      } else {
+        resetResultsIfEmpty();
       }
     }
 
@@ -196,9 +199,9 @@
         const farmerName = getFieldValue(item, ['Farmer_Name', 'Farmer Name', 'farmer_name', 'farmername']).toString().trim().toLowerCase();
         
         if (type === 'farm_id') {
-          return farmId === query;
+          return farmId.includes(query);
         } else {
-          return farmerName === query;
+          return farmerName.includes(query);
         }
       });
 
@@ -254,16 +257,20 @@
       });
     }
 
-    // Reset කිරීම
-    function resetSearch() {
-      document.getElementById('farmIdDropdown').value = "";
-      document.getElementById('farmerNameDropdown').value = "";
+    function resetResultsIfEmpty() {
       document.getElementById('resultsContainer').innerHTML = `
         <div class="text-center p-16 bg-white rounded-xl shadow-inner text-gray-500">
           <img src="https://img.icons8.com/isometric/100/search-property.png" alt="Search Property Icon" class="mx-auto mb-4"/>
-          ඉහත ලැයිස්තු වලින් Farm ID එකක් හෝ Farmer Name එකක් තෝරන්න.
+          ඉහත කොටුවලට Farm ID එකක් හෝ ගොවිමහතාගේ නම ටයිප් කරන්න හෝ තෝරන්න.
         </div>
       `;
+    }
+
+    // Reset කිරීම
+    function resetSearch() {
+      document.getElementById('farmIdInput').value = "";
+      document.getElementById('farmerNameInput').value = "";
+      resetResultsIfEmpty();
     }
 
     loadData();
