@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ගොවිපළ තොරතුරු පද්ධතිය-ඉබ්බාගමුව පශු වෛද්‍ය කාර්යාලය | Dairy Farm Data Portal</title>
+  <title>කෘත්‍රිම සිංචන තොරතුරු-ඉබ්බාගමුව පශු වෛද්‍ය කාර්යාලය | AI Data Portal</title>
   
   <!-- Tailwind CSS - Open Source UI Framework -->
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
@@ -25,7 +25,7 @@
     <div class="max-w-7xl mx-auto flex items-center justify-between">
       <div class="flex items-center gap-3">
         <img src="https://img.icons8.com/color/48/cow.png" alt="Cow Icon" class="w-10 h-10">
-        <h1 class="text-2xl md:text-3xl font-bold text-gray-800">ගොවිපළ තොරතුරු පද්ධතිය-ඉබ්බාගමුව පශු වෛද්‍ය කාර්යාලය</h1>
+        <h1 class="text-xl md:text-2xl font-bold text-gray-800">කෘත්‍රිම සිංචන තොරතුරු-ඉබ්බාගමුව පශු වෛද්‍ය කාර්යාලය</h1>
       </div>
       <p class="text-sm text-gray-500 hidden md:block">Data Source: Google Sheet (සජීවීව)</p>
     </div>
@@ -34,11 +34,14 @@
   <!-- Main Content Area -->
   <main class="max-w-7xl mx-auto p-6">
     
-    <!-- Search Section -->
+    <!-- Search Section with Dropdown -->
     <div class="bg-white p-6 rounded-xl shadow-sm mb-8">
-      <h2 class="text-xl font-semibold text-gray-700 mb-4">ගොවිපල අංකය 6130 සමග අවසන් ඉලක්කම 4 හෝ ගොවිමහතාගේ නම යොදන්න</h2>
+      <h2 class="text-lg font-semibold text-gray-700 mb-4">ගොවිපල අංකය 6130 සමග අවසන් ඉලක්කම් 4 හෝ ගොවිමහතාගේ නම ඉංග්‍රිසි අකුරෙන් යොදන්න</h2>
       <div class="flex flex-col md:flex-row gap-4">
-        <input type="text" id="searchInput" placeholder="උදා: 61304 හෝ කුමාර දිසානායක..." class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+        <!-- Dropdown Select Box -->
+        <select id="searchInput" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white">
+          <option value="">-- ලැයිස්තුවෙන් තෝරන්න --</option>
+        </select>
         <button onclick="filterData()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-3 rounded-lg flex items-center gap-2 justify-center transition">
           <img src="https://img.icons8.com/ios-glyphs/30/ffffff/search--v1.png" class="w-5 h-5"/>
           සොයන්න
@@ -56,14 +59,14 @@
     <div id="resultsContainer" class="space-y-6">
       <div class="text-center p-16 bg-white rounded-xl shadow-inner text-gray-500">
         <img src="https://img.icons8.com/isometric/100/search-property.png" alt="Search Property Icon" class="mx-auto mb-4"/>
-        සෙවුම් කිරීමට ගොවිපල අංකය හෝ නම ඇතුළත් කර 'සොයන්න' ක්ලික් කරන්න.
+        සෙවුම් කිරීමට ලැයිස්තුවෙන් අංකය හෝ නම තෝරා 'සොයන්න' ක්ලික් කරන්න.
       </div>
     </div>
 
   </main>
 
   <footer class="text-center p-6 text-gray-500 text-sm mt-12 border-t border-gray-200">
-    © 2026 Dairy Farm Data Portal - ඉබ්බාගමුව පශු වෛද්‍ය කාර්යාලය. Built with Open Source Tech.
+    © 2026 කෘත්‍රිම සිංචන තොරතුරු - ඉබ්බාගමුව පශු වෛද්‍ය කාර්යාලය.
   </footer>
 
   <script>
@@ -73,7 +76,7 @@
 
     let farmData = [];
 
-    // API එකෙන් Data Fetch කර ගැනීම
+    // API එකෙන් Data Fetch කර ගැනීම සහ Dropdown එක Populate කිරීම
     async function loadData() {
       const loading = document.getElementById('loadingIndicator');
       loading.classList.remove('hidden');
@@ -82,6 +85,9 @@
         const res = await fetch(API_URL);
         farmData = await res.json();
         console.log("Loaded Farm Data successfully:", farmData);
+
+        populateDropdown();
+
       } catch (error) {
         console.error("Error loading data:", error);
         document.getElementById('resultsContainer').innerHTML = `
@@ -105,14 +111,41 @@
       return '';
     }
 
+    // Dropdown එකට Farm ID සහ Farmer Name ඇතුළත් කිරීම
+    function populateDropdown() {
+      const selectElement = document.getElementById('searchInput');
+      let optionsSet = new Set();
+
+      farmData.forEach(item => {
+        const farmId = getFieldValue(item, ['Farm_ID', 'Farm ID', 'farm_id', 'farmid']);
+        const farmerName = getFieldValue(item, ['Farmer_Name', 'Farmer Name', 'farmer_name', 'farmername']);
+
+        if (farmId) {
+          optionsSet.add(farmId.toString());
+        }
+        if (farmerName) {
+          optionsSet.add(farmerName.toString());
+        }
+      });      
+
+      let sortedOptions = Array.from(optionsSet).sort();
+
+      sortedOptions.forEach(optionValue => {
+        let opt = document.createElement('option');
+        opt.value = optionValue.toLowerCase();
+        opt.textContent = optionValue;
+        selectElement.appendChild(opt);
+      });
+    }
+
     // Filter කිරීමේ ප්‍රධාන Function එක
     function filterData() {
-      const query = document.getElementById('searchInput').value.toLowerCase().trim();
+      const query = document.getElementById('searchInput').value.trim();
       const container = document.getElementById('resultsContainer');
       container.innerHTML = '';
 
       if (!query) {
-        container.innerHTML = `<p class="text-center p-12 text-gray-500">කරුණාකර සෙවුම් පදයක් ඇතුළත් කරන්න.</p>`;
+        container.innerHTML = `<p class="text-center p-12 text-gray-500">කරුණාකර ලැයිස්තුවෙන් ගොවිපළක් හෝ ගොවිමහතෙක් තෝරන්න.</p>`;
         return;
       }
 
@@ -120,14 +153,14 @@
         const farmId = getFieldValue(item, ['Farm_ID', 'Farm ID', 'farm_id', 'farmid']).toString().toLowerCase();
         const farmerName = getFieldValue(item, ['Farmer_Name', 'Farmer Name', 'farmer_name', 'farmername']).toString().toLowerCase();
         
-        return farmId.includes(query) || farmerName.includes(query);
+        return farmId === query || farmerName === query;
       });
 
       if (filtered.length === 0) {
         container.innerHTML = `
           <div class="text-center p-16 bg-white rounded-xl shadow-inner text-red-500">
             <img src="https://img.icons8.com/isometric/100/delete-property.png" alt="Not Found Icon" class="mx-auto mb-4"/>
-            '<strong>${query}</strong>' සදහා තොරතුරු හමු නොවීය. කරුණාකර වෙනත් අංකයක් හෝ නමක් පරීක්ෂා කරන්න.
+            තොරතුරු හමු නොවීය.
           </div>
         `;
         return;
@@ -139,12 +172,10 @@
         const address = getFieldValue(item, ['Address', 'address']);
         const contactNo = getFieldValue(item, ['Contact_no', 'Contact No', 'contact_no', 'phone']);
         
-        const farmIdStr = farmId.toString().toLowerCase();
-        
         let primaryTitle = '';
         let secondaryTitle = '';
 
-        if (farmIdStr.includes(query)) {
+        if (farmId.toString().toLowerCase() === query) {
           primaryTitle = `<span class="text-gray-500 text-sm block mb-1">Farmer Name:</span> <span class="text-blue-900">${farmerName || '-'}</span>`;
           secondaryTitle = `Farm ID: <span class="font-semibold text-gray-800">${farmId || '-'}</span>`;
         } else {
@@ -160,23 +191,21 @@
                 <p class="text-lg text-gray-600 mt-1">${secondaryTitle}</p>
               </div>
               <div class="text-left md:text-right text-gray-600 bg-gray-50 p-3 rounded-lg border border-gray-100">
-                <p><strong>ලිපිනය:</strong> ${address || '-'}</p>
-                <p><strong>දුරකථන:</strong> ${contactNo || '-'}</p>
+                <p><strong>Address:</strong> ${address || '-'}</p>
+                <p><strong>Contact no:</strong> ${contactNo || '-'}</p>
               </div>
             </div>
 
-            <!-- Detailed Grid -->
+            <!-- Detailed Grid (Requested Fields Only) -->
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-3 text-sm">
               <p><strong>Date:</strong> ${getFieldValue(item, ['Date', 'date']) || '-'}</p>
               <p><strong>Cow ID:</strong> ${getFieldValue(item, ['Cow_ID', 'Cow ID', 'cow_id']) || '-'}</p>
-              <p><strong>Cow Name:</strong> ${getFieldValue(item, ['Cow_Name', 'Cow Name', 'cow_name']) || '-'}</p>
-              <p><strong>Pregnancy:</strong> ${getFieldValue(item, ['Pregnancy', 'pregnancy']) || '-'}</p>
+              <p><strong>No of calving:</strong> ${getFieldValue(item, ['No_of_calving', 'No of calving', 'no_of_calving']) || '-'}</p>
+              <p><strong>Calving Date 1:</strong> ${getFieldValue(item, ['Calving_Date_1', 'Calving Date 1', 'calving_date_1']) || '-'}</p>
+              <p><strong>Milk Production:</strong> ${getFieldValue(item, ['Milk_Production', 'Milk Production', 'Milk Prouction', 'milk_production']) || '-'} L</p>
+              <p><strong>Semen code:</strong> ${getFieldValue(item, ['Semen_code', 'Semen Code', 'semen_code']) || '-'}</p>
+              <p><strong>Receipt no:</strong> ${getFieldValue(item, ['Receipt_no', 'Receipt No', 'Reeipt no', 'receipt_no']) || '-'}</p>
               <p><strong>Date to be calved:</strong> ${getFieldValue(item, ['Date_to_be_calved', 'Date to be calved', 'date_to_be_calved']) || '-'}</p>
-              <p><strong>Milk Production:</strong> ${getFieldValue(item, ['Milk_Production', 'Milk Production', 'milk_production']) || '-'} L</p>
-              <p><strong>Next Heat:</strong> ${getFieldValue(item, ['Next_Heat', 'Next Heat', 'next_heat']) || '-'}</p>
-              <p><strong>Calve Name/ID:</strong> ${getFieldValue(item, ['Calve_name', 'Calve Name', 'calve_name']) || '-'} (${getFieldValue(item, ['Calve_ID', 'Calve ID', 'calve_id']) || '-'})</p>
-              <p><strong>Semen Code:</strong> ${getFieldValue(item, ['Semen_code', 'Semen Code', 'semen_code']) || '-'}</p>
-              <p><strong>Receipt no:</strong> ${getFieldValue(item, ['Receipt_no', 'Receipt No', 'receipt_no']) || '-'}</p>
             </div>
             
             <!-- File/Photo Links -->
@@ -190,7 +219,6 @@
       });
     }
 
-    // පිටුව Load වන විට Data ලෝඩ් කිරීම ආරම්භ කරයි
     loadData();
   </script>
 </body>
