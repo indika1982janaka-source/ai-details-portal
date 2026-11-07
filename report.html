@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Melsiripura LDI තොරතුරු පද්ධතිය</title>
+  
+  <!-- Tailwind CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  
+  <style>
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, 'Noto Sans Sinhala'; }
+    .data-card { transition: all 0.3s ease; }
+    .data-card:hover { transform: translateY(-3px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05); }
+    .loader { border-top-color: #3498db; -webkit-animation: spinner 1.5s linear infinite; animation: spinner 1.5s linear infinite; }
+    @-webkit-keyframes spinner { 0% { -webkit-transform: rotate(0deg); } 100% { -webkit-transform: rotate(360deg); } }
+    @keyframes spinner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+  <!-- Header -->
+  <header class="bg-white shadow-md p-4">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <img src="https://img.icons8.com/color/48/cow.png" alt="Cow Icon" class="w-10 h-10">
+        <h1 class="text-xl md:text-2xl font-bold text-gray-800">Melsiripura LDI තොරතුරු පද්ධතිය</h1>
+      </div>
+      <a href="index.html" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium px-4 py-2 rounded-lg text-sm transition">← මුල් පිටුවට</a>
+    </div>
+  </header>
+
+  <!-- Main Content Area -->
+  <main class="max-w-7xl mx-auto p-6">
+    
+    <!-- Search Section with Dropdown -->
+    <div class="bg-white p-6 rounded-xl shadow-sm mb-8">
+      <h2 class="text-lg font-semibold text-gray-700 mb-4">ගොවිපල අංකය (Farm ID) හෝ ගොවිමහතාගේ නම (Name of Farmer) තෝරන්න</h2>
+      <div class="flex flex-col md:flex-row gap-4">
+        <!-- Dropdown Select Box -->
+        <select id="searchInput" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white">
+          <option value="">-- ලැයිස්තුවෙන් තෝරන්න --</option>
+        </select>
+        <button onclick="filterData()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-3 rounded-lg flex items-center gap-2 justify-center transition">
+          <img src="https://img.icons8.com/ios-glyphs/30/ffffff/search--v1.png" class="w-5 h-5"/>
+          සොයන්න
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading Indicator -->
+    <div id="loadingIndicator" class="hidden flex flex-col items-center justify-center p-12 text-gray-600">
+      <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12 mb-4"></div>
+      <p>දත්ත පූරණය වෙමින් පවතී, කරුණාකර රැඳී සිටින්න...</p>
+    </div>
+
+    <!-- Results Display Area -->
+    <div id="resultsContainer" class="space-y-6">
+      <div class="text-center p-16 bg-white rounded-xl shadow-inner text-gray-500">
+        <img src="https://img.icons8.com/isometric/100/search-property.png" alt="Search Property Icon" class="mx-auto mb-4"/>
+        සෙවුම් කිරීමට ලැයිස්තුවෙන් Farm ID එකක් හෝ නමක් තෝරා 'සොයන්න' ක්ලික් කරන්න.
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="text-center p-6 text-gray-500 text-sm mt-12 border-t border-gray-200">
+    © 2026 Melsiripura LDI Portal. Built with Open Source Tech.
+  </footer>
+
+  <script>
+    // --- CONFIGURATION ---
+    const API_URL = "https://script.google.com/macros/s/AKfycbzE5lqlQmKk4ITXEK0p6juSPiH_qLgOwKLQ4wEUF-AnYOH-iGT4zc9IvPUYHamFjrkmyw/exec";
+    // --- END CONFIGURATION ---
+
+    let farmData = [];
+
+    async function loadData() {
+      const loading = document.getElementById('loadingIndicator');
+      loading.classList.remove('hidden');
+      
+      try {
+        const res = await fetch(API_URL);
+        farmData = await res.json();
+        console.log("Loaded Data successfully:", farmData);
+        populateDropdown();
+      } catch (error) {
+        console.error("Error loading data:", error);
+        document.getElementById('resultsContainer').innerHTML = `
+          <div class="text-center p-12 bg-red-50 text-red-600 rounded-xl border border-red-200">
+            <h3 class="font-bold text-lg mb-2">Error Connecting to Data Source</h3>
+            <p>Google Sheet එක සමඟ සම්බන්ධ වීමට නොහැකි විය. Web App URL එක පරීක්ෂා කරන්න.</p>
+          </div>
+        `;
+      } finally {
+        loading.classList.add('hidden');
+      }
+    }
+
+    function getFieldValue(item, keys) {
+      for (let key of keys) {
+        if (item[key] !== undefined && item[key] !== null && item[key] !== '') {
+          return item[key];
+        }
+      }
+      return '';
+    }
+
+    function populateDropdown() {
+      const selectElement = document.getElementById('searchInput');
+      let optionsSet = new Set();
+
+      farmData.forEach(item => {
+        const farmId = getFieldValue(item, ['Farm_ID', 'Farm ID', 'farm_id', 'farmid']);
+        const farmerName = getFieldValue(item, ['Name_of_Farmer', 'Name of Farmer', 'name_of_farmer', 'farmername']);
+
+        if (farmId) optionsSet.add(farmId.toString());
+        if (farmerName) optionsSet.add(farmerName.toString());
+      });      
+
+      let sortedOptions = Array.from(optionsSet).sort();
+
+      sortedOptions.forEach(optionValue => {
+        let opt = document.createElement('option');
+        opt.value = optionValue.toLowerCase();
+        opt.textContent = optionValue;
+        selectElement.appendChild(opt);
+      });
+    }
+
+    function filterData() {
+      const query = document.getElementById('searchInput').value.trim();
+      const container = document.getElementById('resultsContainer');
+      container.innerHTML = '';
+
+      if (!query) {
+        container.innerHTML = `<p class="text-center p-12 text-gray-500">කරුණාකර ලැයිස්තුවෙන් නමක් හෝ Farm ID එකක් තෝරන්න.</p>`;
+        return;
+      }
+
+      const filtered = farmData.filter(item => {
+        const farmId = getFieldValue(item, ['Farm_ID', 'Farm ID', 'farm_id', 'farmid']).toString().toLowerCase();
+        const farmerName = getFieldValue(item, ['Name_of_Farmer', 'Name of Farmer', 'name_of_farmer', 'farmername']).toString().toLowerCase();
+        
+        return farmId === query || farmerName === query;
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="text-center p-16 bg-white rounded-xl shadow-inner text-red-500">
+            <img src="https://img.icons8.com/isometric/100/delete-property.png" alt="Not Found Icon" class="mx-auto mb-4"/>
+            තොරතුරු හමු නොවීය.
+          </div>
+        `;
+        return;
+      }
+
+      filtered.forEach(item => {
+        const farmId = getFieldValue(item, ['Farm_ID', 'Farm ID', 'farm_id', 'farmid']);
+        const farmerName = getFieldValue(item, ['Name_of_Farmer', 'Name of Farmer', 'name_of_farmer', 'farmername']);
+        const address = getFieldValue(item, ['Address', 'address']);
+        const contactNo = getFieldValue(item, ['Contact_no', 'Contact no', 'contact_no']);
+        const farmType = getFieldValue(item, ['Farm_Type', 'Farm Type', 'farm_type']);
+        const ldiRange = getFieldValue(item, ['LDI_Range', 'LDI Range', 'ldi_range']);
+        const gnDivision = getFieldValue(item, ['G_N_Division', 'G/N Division', 'g_n_division']);
+        const image = getFieldValue(item, ['Image', 'image']);
+
+        let primaryTitle = '';
+        let secondaryTitle = '';
+
+        if (farmId.toString().toLowerCase() === query) {
+          primaryTitle = `<span class="text-gray-500 text-sm block mb-1">Name of Farmer:</span> <span class="text-blue-900">${farmerName || '-'}</span>`;
+          secondaryTitle = `Farm ID: <span class="font-semibold text-gray-800">${farmId || '-'}</span>`;
+        } else {
+          primaryTitle = `<span class="text-gray-500 text-sm block mb-1">Farm ID:</span> <span class="text-blue-900">${farmId || '-'}</span>`;
+          secondaryTitle = `Name of Farmer: <span class="font-semibold text-gray-800">${farmerName || '-'}</span>`;
+        }
+
+        const card = `
+          <div class="data-card bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4 border-b border-gray-200 pb-4">
+              <div>
+                <h2 class="text-2xl font-bold">${primaryTitle}</h2>
+                <p class="text-lg text-gray-600 mt-1">${secondaryTitle}</p>
+                <p class="text-sm text-gray-500 mt-1">Farm Type: <strong>${farmType || '-'}</strong> | LDI Range: <strong>${ldiRange || '-'}</strong> | G/N Division: <strong>${gnDivision || '-'}</strong></p>
+              </div>
+              <div class="text-left md:text-right text-gray-600 bg-gray-50 p-3 rounded-lg border border-gray-100">
+                <p><strong>Address:</strong> ${address || '-'}</p>
+                <p><strong>Contact no:</strong> ${contactNo || '-'}</p>
+              </div>
+            </div>
+
+            <!-- Detailed Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-3 text-sm">
+              <p><strong>Total No of Cattles:</strong> ${getFieldValue(item, ['Total_No_of_Cattles', 'Total No of Cattles', 'total_no_of_cattles']) || '-'}</p>
+              <p><strong>Total no of MC:</strong> ${getFieldValue(item, ['Total_no_of_MC', 'Total no of MC', 'total_no_of_mc']) || '-'}</p>
+              <p><strong>No of MC (Pregnant):</strong> ${getFieldValue(item, ['No_of_MC_Pregnant', 'No of MC (Pregnant)', 'no_of_mc_pregnant']) || '-'}</p>
+              <p><strong>No of MC (N/P):</strong> ${getFieldValue(item, ['No_of_MC_NP', 'No of MC (N/P)', 'no_of_mc_np']) || '-'}</p>
+              <p><strong>No of DC:</strong> ${getFieldValue(item, ['No_of_DC', 'No of DC', 'no_of_dc']) || '-'}</p>
+              <p><strong>DC (Pregnant):</strong> ${getFieldValue(item, ['DC_Pregnant', 'DC (Pregnant)', 'dc_pregnant']) || '-'}</p>
+              <p><strong>DC (N/P):</strong> ${getFieldValue(item, ['DC_NP', 'DC (N/P)', 'dc_np']) || '-'}</p>
+              <p><strong>No of Heifers:</strong> ${getFieldValue(item, ['No_of_Heifers', 'No of Heifers', 'no_of_heifers']) || '-'}</p>
+              <p><strong>Heifers (Pregnant):</strong> ${getFieldValue(item, ['Heifers_Pregnant', 'Heifers (Pregnant)', 'heifers_pregnant']) || '-'}</p>
+              <p><strong>Heifers (N/P):</strong> ${getFieldValue(item, ['Heifers_NP', 'Heifers (N/P)', 'heifers_np']) || '-'}</p>
+              <p><strong>No of Calves:</strong> ${getFieldValue(item, ['No_of_Calves', 'No of Calves', 'no_of_calves']) || '-'}</p>
+              <p><strong>Calves (FM):</strong> ${getFieldValue(item, ['Calves_FM', 'Calves (FM)', 'calves_fm']) || '-'}</p>
+              <p><strong>Calves (M):</strong> ${getFieldValue(item, ['Calves_M', 'Calves (M)', 'calves_m']) || '-'}</p>
+              <p><strong>No of Studs:</strong> ${getFieldValue(item, ['No_of_Studs', 'No of Studs', 'no_of_studs']) || '-'}</p>
+              <p><strong>Total MP:</strong> ${getFieldValue(item, ['Total_MP', 'Total MP', 'total_mp']) || '-'} L</p>
+              <p><strong>Morning:</strong> ${getFieldValue(item, ['Morning', 'morning']) || '-'} L</p>
+              <p><strong>Evening:</strong> ${getFieldValue(item, ['Evening', 'evening']) || '-'} L</p>
+              <p><strong>MCC:</strong> ${getFieldValue(item, ['MCC', 'mcc']) || '-'}</p>
+              <p><strong>Amounts of collected:</strong> ${getFieldValue(item, ['Amounts_of_collected', 'Amounts of collected', 'amounts_of_collected']) || '-'}</p>
+              <p><strong>Cattle Shed:</strong> ${getFieldValue(item, ['Cattle_Shed', 'Cattle Shed', 'cattle_shed']) || '-'}</p>
+              <p><strong>Cultivated grass (prch):</strong> ${getFieldValue(item, ['Cultivated_grass_prch', 'Cultivated grass (prch)', 'cultivated_grass_prch']) || '-'}</p>
+              <p><strong>Type of Grass:</strong> ${getFieldValue(item, ['Type_of_Grass', 'Type of Grass', 'type_of_grass']) || '-'}</p>
+              <p><strong>TMR feeding:</strong> ${getFieldValue(item, ['TMR_feeding', 'TMR feeding', 'tmr_feeding']) || '-'}</p>
+              <p><strong>No of Goats:</strong> ${getFieldValue(item, ['No_of_Goats', 'No of Goats', 'no_of_goats']) || '-'}</p>
+              <p><strong>No of Pigs:</strong> ${getFieldValue(item, ['No_of_Pigs', 'No of Pigs', 'no_of_pigs']) || '-'}</p>
+              <p><strong>No of Layers:</strong> ${getFieldValue(item, ['No_of_Layers', 'No of Layers', 'no_of_layers']) || '-'}</p>
+              <p><strong>No of Broilers:</strong> ${getFieldValue(item, ['No_of_Broilers', 'No of Broilers', 'no_of_broilers']) || '-'}</p>
+              <p><strong>No of Backyards:</strong> ${getFieldValue(item, ['No_of_Backyards', 'No of Backyards', 'no_of_backyards']) || '-'}</p>
+              <p><strong>No of Other Species:</strong> ${getFieldValue(item, ['No_of_Other_Species', 'No of Other Species', 'no_of_other_species']) || '-'}</p>
+              <p class="sm:col-span-2 md:col-span-3 lg:col-span-4"><strong>Descriptions:</strong> ${getFieldValue(item, ['Descriptions', 'descriptions']) || '-'}</p>
+            </div>
+            
+            <!-- Image Link -->
+            <div class="mt-6 pt-4 border-t border-gray-100 flex flex-wrap gap-4 text-sm">
+              ${image ? `<a href="${image}" target="_blank" class="bg-blue-50 text-blue-700 font-medium px-4 py-2 rounded-full hover:bg-blue-100 transition">Image බලන්න →</a>` : ''}
+            </div>
+          </div>
+        `;
+        container.innerHTML += card;
+      });
+    }
+
+    loadData();
+  </script>
+</body>
+</html>
