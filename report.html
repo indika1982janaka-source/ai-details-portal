@@ -10,79 +10,30 @@
   
   <style>
     /* සිංහල Fonts සදහා */
-    body { 
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, 'Noto Sans Sinhala'; 
-      background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%);
-    }
-    .data-card { 
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
-      border-left: 5px solid #3b82f6;
-    }
-    .data-card:hover { 
-      transform: translateY(-4px); 
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); 
-    }
-
-    /* ලා නිල් (Light Blue) වර්ණයෙන් යුත් අලංකාර Animated Search Box එක */
-    .animated-search-box {
-      background: linear-gradient(135deg, #ebf8ff 0%, #e0f2fe 100%);
-      border: 2px solid #bae6fd;
-      position: relative;
-      overflow: visible !important; /* Dropdown එක පිටතට පෙන්වීම සඳහා */
-      transition: all 0.4s ease;
-    }
-    .animated-search-box::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: radial-gradient(circle, rgba(56, 189, 248, 0.1) 0%, transparent 70%);
-      transform: rotate(45deg);
-      animation: pulseGlow 6s infinite linear;
-      pointer-events: none;
-    }
-    @keyframes pulseGlow {
-      0% { transform: rotate(0deg) scale(1); }
-      50% { transform: rotate(180deg) scale(1.1); }
-      100% { transform: rotate(360deg) scale(1); }
-    }
-    .animated-search-box:hover {
-      border-color: #38bdf8;
-      box-shadow: 0 15px 30px -5px rgba(56, 189, 248, 0.25);
-    }
-
-    /* Custom Dropdown List Styling */
-    #dropdownSuggestions {
-      max-height: 250px;
-      overflow-y: auto;
-      z-index: 100;
-    }
-
-    .loader { border-top-color: #3b82f6; -webkit-animation: spinner 1.2s linear infinite; animation: spinner 1.2s linear infinite; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, 'Noto Sans Sinhala'; }
+    .data-card { transition: all 0.3s ease; }
+    .data-card:hover { transform: translateY(-3px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05); }
+    .loader { border-top-color: #3498db; -webkit-animation: spinner 1.5s linear infinite; animation: spinner 1.5s linear infinite; }
     @-webkit-keyframes spinner { 0% { -webkit-transform: rotate(0deg); } 100% { -webkit-transform: rotate(360deg); } }
     @keyframes spinner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
   </style>
 </head>
-<body class="min-h-screen text-gray-800">
+<body class="bg-gray-100 min-h-screen">
 
-  <!-- Header with Modern Gradient Background -->
-  <header class="bg-gradient-to-r from-blue-900 via-indigo-800 to-blue-700 shadow-lg text-white p-4 sticky top-0 z-50">
+  <!-- Header with Navigation Menu on Top Left -->
+  <header class="bg-white shadow-md p-4">
     <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
       
       <!-- Logo and Title -->
       <div class="flex items-center gap-3">
-        <div class="bg-white/10 p-2 rounded-xl backdrop-blur-md border border-white/20">
-          <img src="https://img.icons8.com/color/48/cow.png" alt="Cow Icon" class="w-9 h-9">
-        </div>
-        <h1 class="text-lg md:text-xl font-bold tracking-wide">කෘත්‍රිම සිංචන තොරතුරු - ඉබ්බාගමුව පශු වෛද්‍ය කාර්යාලය</h1>
+        <img src="https://img.icons8.com/color/48/cow.png" alt="Cow Icon" class="w-10 h-10">
+        <h1 class="text-xl md:text-2xl font-bold text-gray-800">කෘත්‍රිම සිංචන තොරතුරු-ඉබ්බාගමුව පශු වෛද්‍ය කාර්යාලය</h1>
       </div>
 
       <!-- Navigation Menu Links -->
-      <nav class="flex items-center gap-2 bg-white/10 p-1.5 rounded-xl backdrop-blur-md border border-white/20">
-        <a href="index.html" class="text-white hover:bg-white/20 font-medium px-4 py-2 rounded-lg text-sm transition">කෘත්‍රිම සිංචන දත්ත</a>
-        <a href="report.html" class="bg-white text-blue-900 font-bold px-4 py-2 rounded-lg text-sm transition shadow-md">ලියාපදිංචි ගොවිපල විස්තර</a>
+      <nav class="flex items-center gap-2 bg-gray-50 p-1.5 rounded-xl border border-gray-200">
+        <a href="index.html" class="text-gray-700 hover:bg-gray-200 font-medium px-4 py-2 rounded-lg text-sm transition">කෘත්‍රිම සිංචන දත්ත</a>
+        <a href="report.html" class="bg-blue-600 text-white font-medium px-4 py-2 rounded-lg text-sm transition shadow-sm">ලියාපදිංචි ගොවිපල විස්තර (Registered Farm details)</a>
       </nav>
 
     </div>
@@ -91,30 +42,24 @@
   <!-- Main Content Area -->
   <main class="max-w-7xl mx-auto p-6">
     
-    <!-- Animated Light Blue Search Section -->
-    <div class="animated-search-box p-6 md:p-8 rounded-3xl shadow-xl mb-8">
-      <h2 class="text-lg md:text-xl font-extrabold text-sky-900 mb-6 flex items-center gap-3">
-        <div class="p-2 bg-sky-500 text-white rounded-xl shadow-md">
-          <svg class="w-6 h-6 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-        </div>
-        ගොවිමහතාගේ නම (Name of Farmer) ඩ්‍රොප්ඩවුන් එකෙන් තෝරන්න හෝ සෘජුවම ටයිප් කරන්න
-      </h2>
+    <!-- Search Section with Single Farmer Name Input -->
+    <div class="bg-white p-6 rounded-xl shadow-sm mb-8">
+      <h2 class="text-lg font-semibold text-gray-700 mb-4">ගොවිමහතාගේ නම (Name of Farmer) ඩ්‍රොප්ඩවුන් එකෙන් තෝරන්න හෝ සෘජුවම ටයිප් කරන්න</h2>
       
-      <div class="grid grid-cols-1 md:grid-cols-1 gap-4 mb-5 relative z-10">
-        <!-- Farmer Name Input with Custom Interactive Dropdown -->
-        <div class="relative">
-          <label class="block text-sm font-bold text-sky-900 mb-2">ගොවිමහතාගේ නම (Name of Farmer):</label>
-          <input type="text" id="farmerNameInput" placeholder="නම ටයිප් කරන්න හෝ ක්ලික් කර ලැයිස්තුවෙන් තෝරන්න..." oninput="onFarmerNameInput()" onclick="showAllDropdown()" class="w-full p-4 border-2 border-sky-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-sky-400/30 focus:border-sky-500 bg-white/95 backdrop-blur-sm transition font-medium shadow-sm" autocomplete="off">
-          
-          <!-- Custom Dropdown Suggestions Box -->
-          <div id="dropdownSuggestions" class="hidden absolute left-0 right-0 mt-2 bg-white border-2 border-sky-200 rounded-2xl shadow-2xl max-h-60 overflow-y-auto z-50"></div>
+      <div class="grid grid-cols-1 md:grid-cols-1 gap-4 mb-4">
+        <!-- Farmer Name Input with Datalist for Dropdown & Direct Typing -->
+        <div>
+          <label class="block text-sm font-medium text-gray-600 mb-1">ගොවිමහතාගේ නම (Name of Farmer):</label>
+          <input type="text" id="farmerNameInput" list="farmerNameOptions" placeholder="නම ටයිප් කරන්න හෝ ඩ්‍රොප්ඩවුන් එකෙන් තෝරන්න..." oninput="onFarmerNameInput()" onchange="onFarmerNameInput()" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white" autocomplete="off">
+          <datalist id="farmerNameOptions">
+            <!-- JavaScript හරහා දත්ත මෙහි පිරවේ -->
+          </datalist>
         </div>
       </div>
 
       <!-- Reset / Clear Button -->
-      <div class="flex justify-end relative z-10">
-        <button onclick="resetSearch()" class="bg-white hover:bg-sky-50 text-sky-800 font-bold px-6 py-3 rounded-xl text-sm transition shadow-md border border-sky-200 flex items-center gap-2 transform hover:-translate-y-0.5">
-          <svg class="w-4 h-4 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+      <div class="flex justify-end">
+        <button onclick="resetSearch()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium px-6 py-2 rounded-lg text-sm transition">
           නැවත සකසන්න (Reset)
         </button>
       </div>
@@ -123,21 +68,21 @@
     <!-- Loading Indicator -->
     <div id="loadingIndicator" class="hidden flex flex-col items-center justify-center p-12 text-gray-600">
       <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12 mb-4"></div>
-      <p class="font-medium">දත්ත පූරණය වෙමින් පවතී, කරුණාකර රැඳී සිටින්න...</p>
+      <p>දත්ත පූරණය වෙමින් පවතී, කරුණාකර රැඳී සිටින්න...</p>
     </div>
 
     <!-- Results Display Area -->
     <div id="resultsContainer" class="space-y-6">
-      <div class="text-center p-16 bg-white/80 backdrop-blur-md rounded-2xl shadow-sm text-gray-400 border border-white">
-        <img src="https://img.icons8.com/isometric/100/search-property.png" alt="Search Property Icon" class="mx-auto mb-4 opacity-70"/>
+      <div class="text-center p-16 bg-white rounded-xl shadow-inner text-gray-500">
+        <img src="https://img.icons8.com/isometric/100/search-property.png" alt="Search Property Icon" class="mx-auto mb-4"/>
         ඉහත කොටුවට ගොවිමහතාගේ නම (Name of Farmer) ටයිප් කරන්න හෝ තෝරන්න.
       </div>
     </div>
 
   </main>
 
-  <footer class="text-center p-6 text-gray-500 text-sm mt-12 border-t border-gray-300/60 bg-white/40 backdrop-blur-md">
-    © 2026 කෘත්‍රිම සිංචන තොරතුරු - ඉබ්බාගමුව පශු වෛද්‍ය කාර්යාලය. සියලු හිමිකම් ඇවිරිණි.
+  <footer class="text-center p-6 text-gray-500 text-sm mt-12 border-t border-gray-200">
+    © 2026 කෘත්‍රිම සිංචන තොරතුරු - ඉබ්බාගමුව පශු වෛද්‍ය කාර්යාලය.
   </footer>
 
   <script>
@@ -146,7 +91,6 @@
     // --- END CONFIGURATION ---
 
     let farmData = [];
-    let allFarmerNames = [];
 
     async function loadData() {
       const loading = document.getElementById('loadingIndicator');
@@ -156,11 +100,14 @@
         const res = await fetch(API_URL);
         farmData = await res.json();
         console.log("Loaded Farm Data successfully:", farmData);
-        extractFarmerNames();
+        if(farmData.length > 0) {
+          console.log("Sheet Headers/Keys:", Object.keys(farmData[0]));
+        }
+        populateDatalists();
       } catch (error) {
         console.error("Error loading data:", error);
         document.getElementById('resultsContainer').innerHTML = `
-          <div class="text-center p-12 bg-red-50 text-red-600 rounded-2xl border border-red-200 shadow-sm">
+          <div class="text-center p-12 bg-red-50 text-red-600 rounded-xl border border-red-200">
             <h3 class="font-bold text-lg mb-2">Error Connecting to Data Source</h3>
             <p>ගූගල් ෂීට් එක සමඟ සම්බන්ධ වීමට නොහැකි විය. Web App URL එක පරීක්ෂා කරන්න.</p>
           </div>
@@ -170,16 +117,15 @@
       }
     }
 
+    // හිස්තැන්, සංකේත සහ කැපිටල්/සිම්පල් අක්ෂර නොසලකා හැර නිවැරදි Field එක ලබාගන්නා Function එක
     function getFieldValue(item, targetKeys) {
       if (!item) return '';
       const itemKeys = Object.keys(item);
       
       for (let targetKey of targetKeys) {
-        if (targetKey.toLowerCase() === 'email') continue;
         const cleanTarget = targetKey.toLowerCase().replace(/[^a-z0-9]/g, '');
         
         for (let key of itemKeys) {
-          if (key.toLowerCase() === 'email') continue;
           const cleanKey = key.toLowerCase().replace(/[^a-z0-9]/g, '');
           if (cleanKey === cleanTarget) {
             const val = item[key];
@@ -192,18 +138,11 @@
       return '';
     }
 
-    function getDirectImageUrl(url) {
-      if (!url) return '';
-      if (url.includes('drive.google.com') && url.includes('id=')) {
-        const idMatch = url.match(/id=([a-zA-Z0-9_-]+)/);
-        if (idMatch && idMatch[1]) {
-          return `https://lh3.googleusercontent.com/d/${idMatch[1]}`; } } else if (url.includes('drive.google.com/file/d/')) { const idMatch = url.match(/\/d\/([a-zA-Z0-9_-]+)/); if (idMatch && idMatch[1]) { return `https://lh3.googleusercontent.com/d/${idMatch[1]}`;
-        }
-      }
-      return url;
-    }
-
-    function extractFarmerNames() {
+    // Datalist වලට ගොවි නම පිරවීම
+    function populateDatalists() {
+      const farmerNameList = document.getElementById('farmerNameOptions');
+      farmerNameList.innerHTML = '';
+      
       let farmerNamesSet = new Set();
 
       farmData.forEach(item => {
@@ -211,67 +150,32 @@
         if (farmerName) farmerNamesSet.add(farmerName.toString().trim());
       });     
 
-      allFarmerNames = Array.from(farmerNamesSet).sort((a, b) => 
+      let sortedFarmerNames = Array.from(farmerNamesSet).sort((a, b) => 
         a.localeCompare(b, 'si', { sensitivity: 'base' })
       );
-    }
 
-    function showAllDropdown() {
-      renderDropdown(allFarmerNames);
-    }
-
-    function onFarmerNameInput() {
-      const query = document.getElementById('farmerNameInput').value.trim();
-      
-      if (query !== "") {
-        const cleanedQuery = cleanString(query);
-        const filteredNames = allFarmerNames.filter(name => cleanString(name).includes(cleanedQuery));
-        renderDropdown(filteredNames);
-        displayResults(query);
-      } else {
-        renderDropdown(allFarmerNames);
-        resetResultsIfEmpty();
-      }
-    }
-
-    function renderDropdown(names) {
-      const dropdown = document.getElementById('dropdownSuggestions');
-      dropdown.innerHTML = '';
-
-      if (names.length === 0) {
-        dropdown.classList.add('hidden');
-        return;
-      }
-
-      names.forEach(name => {
-        const div = document.createElement('div');
-        div.className = 'p-3 hover:bg-sky-100 cursor-pointer text-gray-700 font-medium border-b border-gray-100 transition';
-        div.textContent = name;
-        div.onclick = function() {
-          document.getElementById('farmerNameInput').value = name;
-          dropdown.classList.add('hidden');
-          displayResults(name);
-        };
-        dropdown.appendChild(div);
+      sortedFarmerNames.forEach(name => {
+        let opt = document.createElement('option');
+        opt.value = name;
+        farmerNameList.appendChild(opt);
       });
-
-      dropdown.classList.remove('hidden');
     }
-
-    // Close dropdown when clicking outside
-    document.addEventListener('click', function(e) {
-      const input = document.getElementById('farmerNameInput');
-      const dropdown = document.getElementById('dropdownSuggestions');
-      if (input && dropdown && !input.contains(e.target) && !dropdown.contains(e.target)) {
-        dropdown.classList.add('hidden');
-      }
-    });
 
     function cleanString(str) {
       if (!str) return '';
       return str.toString().toLowerCase().replace(/\s+/g, ' ').trim();
     }
 
+    function onFarmerNameInput() {
+      const farmerNameVal = document.getElementById('farmerNameInput').value;
+      if (farmerNameVal.trim() !== "") {
+        displayResults(farmerNameVal);
+      } else {
+        resetResultsIfEmpty();
+      }
+    }
+
+    // ප්‍රතිඵල පෙන්වන ප්‍රධාන Function එක
     function displayResults(query) {
       const container = document.getElementById('resultsContainer');
       container.innerHTML = '';
@@ -286,7 +190,7 @@
 
       if (filtered.length === 0) {
         container.innerHTML = `
-          <div class="text-center p-16 bg-white rounded-2xl shadow-sm text-red-500 border border-red-100">
+          <div class="text-center p-16 bg-white rounded-xl shadow-inner text-red-500">
             <img src="https://img.icons8.com/isometric/100/delete-property.png" alt="Not Found Icon" class="mx-auto mb-4"/>
             තොරතුරු හමු නොවීය.
           </div>
@@ -295,6 +199,7 @@
       }
 
       filtered.forEach(item => {
+        // Basic Info
         const rawFarmId = getFieldValue(item, ['Farm_ID', 'Farm ID', 'farm_id', 'farmid']);
         const farmId = rawFarmId ? (rawFarmId.toString().startsWith('6130') ? rawFarmId : '6130' + rawFarmId) : '-';
 
@@ -303,17 +208,21 @@
         const address = getFieldValue(item, ['Address', 'address']);
         const contactNo = getFieldValue(item, ['Contact_no', 'Contact No', 'phone', 'Contact no', 'contact_no', 'Mobile']);
         
+        // LDI Range & GN Division ලබාගැනීම
         const ldiRange = getFieldValue(item, ['LDI Range', 'LDI_Range', 'LDIRange', 'ldi range', 'Range', 'LDI']);
         const gnDivision = getFieldValue(item, ['G/N Division', 'G_N_Division', 'GN Division', 'G N Division', 'gn division', 'GNDivision', 'GN_Division', 'GN', 'Gramadhari']);
         
+        // Cattle & Milk Info
         const totalCattles = getFieldValue(item, ['Total No of Cattles', 'Total_No_of_Cattles', 'TotalNoOfCattles', 'Total Cattles', 'Cattles', 'CattleCount']);
         const totalMp = getFieldValue(item, ['Total MP', 'Total_MP', 'TotalMP', 'MP', 'Milk Production', 'MilkYield']);
         const cattleShed = getFieldValue(item, ['Cattle Shed', 'Cattle_Shed', 'cattleshed', 'Shed']);
         
+        // Fodder / Grass Info
         const cultivatedGrass = getFieldValue(item, ['Cultivated grass (prch)', 'Cultivated grass', 'Cultivated_grass_prch', 'Cultivated_grass', 'Grass prch', 'GrassPurches']);
         const typeOfGrass = getFieldValue(item, ['Type of Grass', 'Type_of_Grass', 'TypeOfGrass', 'Grass Type', 'GrassVariety']);
         const tmrFeeding = getFieldValue(item, ['TMR feeding', 'TMR_feeding', 'TMR', 'Feeding']);
         
+        // Other Livestock Info
         const noOfGoats = getFieldValue(item, ['No of Goats', 'No_of_Goats', 'Goats']);
         const noOfPigs = getFieldValue(item, ['No of Pigs', 'No_of_Pigs', 'Pigs']);
         const noOfLayers = getFieldValue(item, ['No of Layers', 'No_of_Layers', 'Layers']);
@@ -321,51 +230,98 @@
         const noOfBackyards = getFieldValue(item, ['No of Backyards', 'No_of_Backyards', 'Backyards']);
         const noOfOtherSpecies = getFieldValue(item, ['No of Other Species', 'No_of_Other_Species', 'Other Species']);
         
+        // Additional Info
         const descriptions = getFieldValue(item, ['Descriptions', 'descriptions', 'Description', 'Notes']);
+        const imageUrl = getFieldValue(item, ['Image', 'image', 'Farm Image', 'Farm_Image', 'Photo']);
         
-        const rawImageUrl = getFieldValue(item, ['Image', 'image', 'Farm Image', 'Farm_Image', 'Photo']);
-        const directImageUrl = getDirectImageUrl(rawImageUrl);
-
         const card = `
-          <div class="data-card bg-white p-6 rounded-2xl shadow-md border border-gray-100 mb-6">
+          <div class="data-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-6">
             
-            <!-- Header Banner Section with Farmer Photo on the Left -->
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4 border-b border-gray-100 pb-4">
-              
-              <div class="flex items-center gap-4">
-                <!-- Farmer / Farm Image Avatar -->
-                ${directImageUrl ? `
-                  <a href="${rawImageUrl || directImageUrl}" target="_blank" title="පින්තූරය විශාලව බලන්න">
-                    <img src="${directImageUrl}" alt="${farmerName}" class="w-16 h-16 md:w-20 md:h-20 object-cover rounded-2xl border-2 border-blue-400 shadow-md hover:scale-105 transition-transform duration-300">
-                  </a>
-                ` : `
-                  <div class="w-16 h-16 md:w-20 md:h-20 bg-blue-100 rounded-2xl border-2 border-blue-200 flex items-center justify-center text-blue-600 font-bold text-2xl shadow-inner">
-                    ${farmerName ? farmerName.charAt(0) : 'F'}
-                  </div>
-                `}
-
-                <div>
-                  <h2 class="text-2xl font-extrabold text-blue-900">${farmerName || '-'}</h2>
-                  <div class="flex flex-wrap items-center gap-3 mt-1.5">
-                    <span class="bg-gray-100 text-gray-700 font-semibold px-3 py-1 rounded-lg text-sm border border-gray-200">Farm ID: <span class="text-blue-600">${farmId}</span></span>${farmType ? `<span class="bg-blue-50 text-blue-700 text-xs font-bold px-3 py-1 rounded-full border border-blue-200">${farmType}</span>` : ''}
-                  </div>
+            <!-- Header Banner Section -->
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4 border-b border-gray-200 pb-4">
+              <div>
+                <h2 class="text-2xl font-bold text-blue-900">${farmerName || '-'}</h2>
+                <div class="flex flex-wrap items-center gap-3 mt-1">
+                  <p class="text-base text-gray-700">Farm ID: <span class="font-semibold text-gray-900">${farmId}</span></p>
+                  ${farmType ? `<span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">${farmType}</span>` : ''}
                 </div>
               </div>
-
-              <div class="text-left md:text-right text-gray-600 bg-blue-50/50 p-3.5 rounded-xl border border-blue-100 text-sm space-y-1">
+              <div class="text-left md:text-right text-gray-600 bg-gray-50 p-3 rounded-lg border border-gray-100 text-sm space-y-1">
                 <p><strong>Address:</strong> ${address || '-'}</p>
-                <p><strong>Contact no:</strong> <a href="tel:${contactNo}" class="text-blue-600 hover:underline font-semibold">${contactNo || '-'}</a></p>
+                <p><strong>Contact no:</strong> ${contactNo || '-'}</p>
                 <p><strong>LDI Range:</strong> ${ldiRange || '-'}</p>
                 <p><strong>G/N Division:</strong> ${gnDivision || '-'}</p>
               </div>
             </div>
 
             <!-- Cattle & Feed Management Section -->
-            <div class="mb-5">
-              <h3 class="text-xs font-bold text-blue-800 uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
-                <span class="w-2 h-2 rounded-full bg-blue-600"></span> ගව පාලනය සහ තෘණ වගාව (Cattle & Feed Details)
-              </h3>
-              <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3.5 text-sm bg-gradient-to-br from-blue-50/60 to-indigo-50/30 p-4 rounded-xl border border-blue-100/60">
-                <p><strong>Total Cattles:</strong> <span class="font-semibold text-blue-900">${totalCattles || '-'}</span></p>
-                <p><strong>Total MP:</strong> <span class="font-semibold text-blue-900">${totalMp ? totalMp + ' L' : '-'}</span></p>
-                <p><strong>Cattle Shed:</strong> <span class="
+            <div class="mb-4">
+              <h3 class="text-sm font-bold text-blue-800 uppercase tracking-wider mb-2 border-b border-blue-100 pb-1">ගව පාලනය සහ තෘණ වගාව (Cattle & Feed Details)</h3>
+              <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 text-sm bg-blue-50/40 p-3 rounded-lg">
+                <p><strong>Total No of Cattles:</strong> ${totalCattles || '-'}</p>
+                <p><strong>Total MP:</strong> ${totalMp ? totalMp + ' L' : '-'}</p>
+                <p><strong>Cattle Shed:</strong> ${cattleShed || '-'}</p>
+                <p><strong>Cultivated grass:</strong> ${cultivatedGrass ? (cultivatedGrass.toString().includes('prch') ? cultivatedGrass : cultivatedGrass + ' prch') : '-'}</p>
+                <p><strong>Type of Grass:</strong> ${typeOfGrass || '-'}</p>
+                <p><strong>TMR feeding:</strong> ${tmrFeeding || '-'}</p>
+              </div>
+            </div>
+
+            <!-- Other Livestock Section -->
+            <div class="mb-4">
+              <h3 class="text-sm font-bold text-green-800 uppercase tracking-wider mb-2 border-b border-green-100 pb-1">වෙනත් සතුන් සහ කුකුළු පාලනය (Other Livestock & Poultry)</h3>
+              <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 text-sm bg-green-50/40 p-3 rounded-lg">
+                <p><strong>Goats:</strong> ${noOfGoats || '0'}</p>
+                <p><strong>Pigs:</strong> ${noOfPigs || '0'}</p>
+                <p><strong>Layers:</strong> ${noOfLayers || '0'}</p>
+                <p><strong>Broilers:</strong> ${noOfBroilers || '0'}</p>
+                <p><strong>Backyards:</strong> ${noOfBackyards || '0'}</p>
+                <p><strong>Other Species:</strong> ${noOfOtherSpecies || '0'}</p>
+              </div>
+            </div>
+
+            <!-- Descriptions Section -->
+            ${descriptions ? `
+              <div class="mb-4 text-sm text-gray-700 bg-gray-50 p-3 rounded-lg border border-gray-100">
+                <p><strong>Descriptions / සටහන්:</strong> ${descriptions}</p>
+              </div>
+            ` : ''}
+
+            <!-- Farm Image Preview if available -->
+            ${imageUrl ? `
+              <div class="mb-4">
+                <p class="text-sm font-semibold text-gray-700 mb-1">Farm Image:</p>
+                <img src="${imageUrl}" alt="Farm Image" class="w-36 h-36 object-cover rounded-lg border border-gray-200 shadow-sm">
+              </div>
+            ` : ''}
+            
+            <!-- File/Photo Links -->
+            <div class="mt-4 pt-4 border-t border-gray-100 flex flex-wrap gap-4 text-sm">
+              ${imageUrl ? `<a href="${imageUrl}" target="_blank" class="bg-indigo-50 text-indigo-700 font-medium px-4 py-2 rounded-full hover:bg-indigo-100 transition">Farm Image බලන්න →</a>` : ''}
+              ${getFieldValue(item, ['Semen deposit photo', 'Semen_deposit_photo']) ? `<a href="${getFieldValue(item, ['Semen deposit photo', 'Semen_deposit_photo'])}" target="_blank" class="bg-blue-50 text-blue-700 font-medium px-4 py-2 rounded-full hover:bg-blue-100 transition">Semen Deposit Photo බලන්න →</a>` : ''}
+              ${getFieldValue(item, ['pdf', 'PDF']) ? `<a href="${getFieldValue(item, ['pdf', 'PDF'])}" target="_blank" class="bg-green-50 text-green-700 font-medium px-4 py-2 rounded-full hover:bg-green-100 transition">PDF Document එක බලන්න →</a>` : ''}
+            </div>
+          </div>
+        `;
+        container.innerHTML += card;
+      });
+    }
+
+    function resetResultsIfEmpty() {
+      document.getElementById('resultsContainer').innerHTML = `
+        <div class="text-center p-16 bg-white rounded-xl shadow-inner text-gray-500">
+          <img src="https://img.icons8.com/isometric/100/search-property.png" alt="Search Property Icon" class="mx-auto mb-4"/>
+          ඉහත කොටුවට ගොවිමහතාගේ නම (Name of Farmer) ටයිප් කරන්න හෝ තෝරන්න.
+        </div>
+      `;
+    }
+
+    function resetSearch() {
+      document.getElementById('farmerNameInput').value = "";
+      resetResultsIfEmpty();
+    }
+
+    loadData();
+  </script>
+</body>
+</html>
