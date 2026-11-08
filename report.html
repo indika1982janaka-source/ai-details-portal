@@ -11,29 +11,50 @@
   <style>
     /* සිංහල Fonts සදහා */
     body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, 'Noto Sans Sinhala'; }
-    .data-card { transition: all 0.3s ease; }
-    .data-card:hover { transform: translateY(-3px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05); }
-    .loader { border-top-color: #3498db; -webkit-animation: spinner 1.5s linear infinite; animation: spinner 1.5s linear infinite; }
+    
+    /* Animations සහ Smooth Transitions */
+    .data-card { 
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      animation: fadeIn 0.5s ease-in-out forwards;
+    }
+    .data-card:hover { 
+      transform: translateY(-5px); 
+      box-shadow: 0 20px 25px -5px rgba(30, 58, 138, 0.15), 0 10px 10px -5px rgba(30, 58, 138, 0.08); 
+    }
+    
+    .section-animate {
+      transition: all 0.3s ease;
+    }
+    .section-animate:hover {
+      transform: scale(1.005);
+    }
+
+    .loader { border-top-color: #1e40af; -webkit-animation: spinner 1.5s linear infinite; animation: spinner 1.5s linear infinite; }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
     @-webkit-keyframes spinner { 0% { -webkit-transform: rotate(0deg); } 100% { -webkit-transform: rotate(360deg); } }
     @keyframes spinner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
   </style>
 </head>
-<body class="bg-gray-100 min-h-screen">
+<body class="bg-blue-50/30 min-h-screen">
 
   <!-- Header with Navigation Menu on Top Left -->
-  <header class="bg-white shadow-md p-4">
+  <header class="bg-white shadow-md p-4 sticky top-0 z-50">
     <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
       
       <!-- Logo and Title -->
       <div class="flex items-center gap-3">
-        <img src="https://img.icons8.com/color/48/cow.png" alt="Cow Icon" class="w-10 h-10">
-        <h1 class="text-xl md:text-2xl font-bold text-gray-800">කෘත්‍රිම සිංචන තොරතුරු-ඉබ්බාගමුව පශු වෛද්‍ය කාර්යාලය</h1>
+        <img src="https://img.icons8.com/color/48/cow.png" alt="Cow Icon" class="w-10 h-10 animate-bounce">
+        <h1 class="text-xl md:text-2xl font-bold text-blue-950">කෘත්‍රිම සිංචන තොරතුරු-ඉබ්බාගමුව පශු වෛද්‍ය කාර්යාලය</h1>
       </div>
 
       <!-- Navigation Menu Links -->
-      <nav class="flex items-center gap-2 bg-gray-50 p-1.5 rounded-xl border border-gray-200">
-        <a href="index.html" class="text-gray-700 hover:bg-gray-200 font-medium px-4 py-2 rounded-lg text-sm transition">කෘත්‍රිම සිංචන දත්ත</a>
-        <a href="report.html" class="bg-blue-600 text-white font-medium px-4 py-2 rounded-lg text-sm transition shadow-sm">ලියාපදිංචි ගොවිපල විස්තර (Registered Farm details)</a>
+      <nav class="flex items-center gap-2 bg-blue-50/60 p-1.5 rounded-xl border border-blue-100">
+        <a href="index.html" class="text-blue-900 hover:bg-blue-100 font-medium px-4 py-2 rounded-lg text-sm transition">කෘත්‍රිම සිංචන දත්ත</a>
+        <a href="report.html" class="bg-blue-800 text-white font-medium px-4 py-2 rounded-lg text-sm transition shadow-md hover:bg-blue-900">ලියාපදිංචි ගොවිපල විස්තර (Registered Farm details)</a>
       </nav>
 
     </div>
@@ -43,14 +64,13 @@
   <main class="max-w-7xl mx-auto p-6">
     
     <!-- Search Section with Single Farmer Name Input -->
-    <div class="bg-white p-6 rounded-xl shadow-sm mb-8">
-      <h2 class="text-lg font-semibold text-gray-700 mb-4">ගොවිමහතාගේ නම (Name of Farmer) ඩ්‍රොප්ඩවුන් එකෙන් තෝරන්න හෝ සෘජුවම ටයිප් කරන්න</h2>
+    <div class="bg-white p-6 rounded-2xl shadow-sm border border-blue-100 mb-8 transition hover:shadow-md">
+      <h2 class="text-lg font-semibold text-blue-900 mb-4">ගොවිමහතාගේ නම (Name of Farmer) ඩ්‍රොප්ඩවුන් එකෙන් තෝරන්න හෝ සෘජුවම ටයිප් කරන්න</h2>
       
       <div class="grid grid-cols-1 md:grid-cols-1 gap-4 mb-4">
-        <!-- Farmer Name Input with Datalist for Dropdown & Direct Typing -->
         <div>
-          <label class="block text-sm font-medium text-gray-600 mb-1">ගොවිමහතාගේ නම (Name of Farmer):</label>
-          <input type="text" id="farmerNameInput" list="farmerNameOptions" placeholder="නම ටයිප් කරන්න හෝ ඩ්‍රොප්ඩවුන් එකෙන් තෝරන්න..." oninput="onFarmerNameInput()" onchange="onFarmerNameInput()" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white" autocomplete="off">
+          <label class="block text-sm font-medium text-gray-700 mb-1">ගොවිමහතාගේ නම (Name of Farmer):</label>
+          <input type="text" id="farmerNameInput" list="farmerNameOptions" placeholder="නම ටයිප් කරන්න හෝ ඩ්‍රොප්ඩවුන් එකෙන් තෝරන්න..." oninput="onFarmerNameInput()" onchange="onFarmerNameInput()" class="w-full p-3 border border-blue-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent bg-blue-50/20 text-gray-800 transition" autocomplete="off">
           <datalist id="farmerNameOptions">
             <!-- JavaScript හරහා දත්ත මෙහි පිරවේ -->
           </datalist>
@@ -59,29 +79,29 @@
 
       <!-- Reset / Clear Button -->
       <div class="flex justify-end">
-        <button onclick="resetSearch()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium px-6 py-2 rounded-lg text-sm transition">
+        <button onclick="resetSearch()" class="bg-blue-100 hover:bg-blue-200 text-blue-900 font-medium px-6 py-2 rounded-xl text-sm transition shadow-sm">
           නැවත සකසන්න (Reset)
         </button>
       </div>
     </div>
 
     <!-- Loading Indicator -->
-    <div id="loadingIndicator" class="hidden flex flex-col items-center justify-center p-12 text-gray-600">
-      <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12 mb-4"></div>
-      <p>දත්ත පූරණය වෙමින් පවතී, කරුණාකර රැඳී සිටින්න...</p>
+    <div id="loadingIndicator" class="hidden flex flex-col items-center justify-center p-12 text-blue-900">
+      <div class="loader ease-linear rounded-full border-4 border-t-4 border-blue-200 h-12 w-12 mb-4"></div>
+      <p class="font-medium animate-pulse">දත්ත පූරණය වෙමින් පවතී, කරුණාකර රැඳී සිටින්න...</p>
     </div>
 
     <!-- Results Display Area -->
     <div id="resultsContainer" class="space-y-6">
-      <div class="text-center p-16 bg-white rounded-xl shadow-inner text-gray-500">
-        <img src="https://img.icons8.com/isometric/100/search-property.png" alt="Search Property Icon" class="mx-auto mb-4"/>
+      <div class="text-center p-16 bg-white rounded-2xl shadow-inner border border-blue-50 text-gray-500">
+        <img src="https://img.icons8.com/isometric/100/search-property.png" alt="Search Property Icon" class="mx-auto mb-4 animate-pulse"/>
         ඉහත කොටුවට ගොවිමහතාගේ නම (Name of Farmer) ටයිප් කරන්න හෝ තෝරන්න.
       </div>
     </div>
 
   </main>
 
-  <footer class="text-center p-6 text-gray-500 text-sm mt-12 border-t border-gray-200">
+  <footer class="text-center p-6 text-gray-500 text-sm mt-12 border-t border-blue-100 bg-white">
     © 2026 කෘත්‍රිම සිංචන තොරතුරු - ඉබ්බාගමුව පශු වෛද්‍ය කාර්යාලය.
   </footer>
 
@@ -107,7 +127,7 @@
       } catch (error) {
         console.error("Error loading data:", error);
         document.getElementById('resultsContainer').innerHTML = `
-          <div class="text-center p-12 bg-red-50 text-red-600 rounded-xl border border-red-200">
+          <div class="text-center p-12 bg-red-50 text-red-600 rounded-2xl border border-red-200">
             <h3 class="font-bold text-lg mb-2">Error Connecting to Data Source</h3>
             <p>ගූගල් ෂීට් එක සමඟ සම්බන්ධ වීමට නොහැකි විය. Web App URL එක පරීක්ෂා කරන්න.</p>
           </div>
@@ -117,7 +137,6 @@
       }
     }
 
-    // හිස්තැන්, සංකේත සහ කැපිටල්/සිම්පල් අක්ෂර නොසලකා හැර නිවැරදි Field එක ලබාගන්නා Function එක
     function getFieldValue(item, targetKeys) {
       if (!item) return '';
       const itemKeys = Object.keys(item);
@@ -138,7 +157,6 @@
       return '';
     }
 
-    // Datalist වලට ගොවි නම පිරවීම
     function populateDatalists() {
       const farmerNameList = document.getElementById('farmerNameOptions');
       farmerNameList.innerHTML = '';
@@ -175,7 +193,6 @@
       }
     }
 
-    // ප්‍රතිඵල පෙන්වන ප්‍රධාන Function එක
     function displayResults(query) {
       const container = document.getElementById('resultsContainer');
       container.innerHTML = '';
@@ -190,8 +207,8 @@
 
       if (filtered.length === 0) {
         container.innerHTML = `
-          <div class="text-center p-16 bg-white rounded-xl shadow-inner text-red-500">
-            <img src="https://img.icons8.com/isometric/100/delete-property.png" alt="Not Found Icon" class="mx-auto mb-4"/>
+          <div class="text-center p-16 bg-white rounded-2xl shadow-inner text-red-500 border border-red-100">
+            <img src="https://img.icons8.com/isometric/100/delete-property.png" alt="Not Found Icon" class="mx-auto mb-4 animate-bounce"/>
             තොරතුරු හමු නොවීය.
           </div>
         `;
@@ -208,7 +225,7 @@
         const address = getFieldValue(item, ['Address', 'address']);
         const contactNo = getFieldValue(item, ['Contact_no', 'Contact No', 'phone', 'Contact no', 'contact_no', 'Mobile']);
         
-        // LDI Range & GN Division ලබාගැනීම
+        // LDI Range & GN Division
         const ldiRange = getFieldValue(item, ['LDI Range', 'LDI_Range', 'LDIRange', 'ldi range', 'Range', 'LDI']);
         const gnDivision = getFieldValue(item, ['G/N Division', 'G_N_Division', 'GN Division', 'G N Division', 'gn division', 'GNDivision', 'GN_Division', 'GN', 'Gramadhari']);
         
@@ -235,93 +252,7 @@
         const imageUrl = getFieldValue(item, ['Image', 'image', 'Farm Image', 'Farm_Image', 'Photo']);
         
         const card = `
-          <div class="data-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-6">
+          <div class="data-card bg-white rounded-2xl shadow-md border border-blue-100 overflow-hidden mb-6">
             
-            <!-- Header Banner Section -->
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4 border-b border-gray-200 pb-4">
-              <div>
-                <h2 class="text-2xl font-bold text-blue-900">${farmerName || '-'}</h2>
-                <div class="flex flex-wrap items-center gap-3 mt-1">
-                  <p class="text-base text-gray-700">Farm ID: <span class="font-semibold text-gray-900">${farmId}</span></p>
-                  ${farmType ? `<span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">${farmType}</span>` : ''}
-                </div>
-              </div>
-              <div class="text-left md:text-right text-gray-600 bg-gray-50 p-3 rounded-lg border border-gray-100 text-sm space-y-1">
-                <p><strong>Address:</strong> ${address || '-'}</p>
-                <p><strong>Contact no:</strong> ${contactNo || '-'}</p>
-                <p><strong>LDI Range:</strong> ${ldiRange || '-'}</p>
-                <p><strong>G/N Division:</strong> ${gnDivision || '-'}</p>
-              </div>
-            </div>
-
-            <!-- Cattle & Feed Management Section -->
-            <div class="mb-4">
-              <h3 class="text-sm font-bold text-blue-800 uppercase tracking-wider mb-2 border-b border-blue-100 pb-1">ගව පාලනය සහ තෘණ වගාව (Cattle & Feed Details)</h3>
-              <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 text-sm bg-blue-50/40 p-3 rounded-lg">
-                <p><strong>Total No of Cattles:</strong> ${totalCattles || '-'}</p>
-                <p><strong>Total MP:</strong> ${totalMp ? totalMp + ' L' : '-'}</p>
-                <p><strong>Cattle Shed:</strong> ${cattleShed || '-'}</p>
-                <p><strong>Cultivated grass:</strong> ${cultivatedGrass ? (cultivatedGrass.toString().includes('prch') ? cultivatedGrass : cultivatedGrass + ' prch') : '-'}</p>
-                <p><strong>Type of Grass:</strong> ${typeOfGrass || '-'}</p>
-                <p><strong>TMR feeding:</strong> ${tmrFeeding || '-'}</p>
-              </div>
-            </div>
-
-            <!-- Other Livestock Section -->
-            <div class="mb-4">
-              <h3 class="text-sm font-bold text-green-800 uppercase tracking-wider mb-2 border-b border-green-100 pb-1">වෙනත් සතුන් සහ කුකුළු පාලනය (Other Livestock & Poultry)</h3>
-              <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 text-sm bg-green-50/40 p-3 rounded-lg">
-                <p><strong>Goats:</strong> ${noOfGoats || '0'}</p>
-                <p><strong>Pigs:</strong> ${noOfPigs || '0'}</p>
-                <p><strong>Layers:</strong> ${noOfLayers || '0'}</p>
-                <p><strong>Broilers:</strong> ${noOfBroilers || '0'}</p>
-                <p><strong>Backyards:</strong> ${noOfBackyards || '0'}</p>
-                <p><strong>Other Species:</strong> ${noOfOtherSpecies || '0'}</p>
-              </div>
-            </div>
-
-            <!-- Descriptions Section -->
-            ${descriptions ? `
-              <div class="mb-4 text-sm text-gray-700 bg-gray-50 p-3 rounded-lg border border-gray-100">
-                <p><strong>Descriptions / සටහන්:</strong> ${descriptions}</p>
-              </div>
-            ` : ''}
-
-            <!-- Farm Image Preview if available -->
-            ${imageUrl ? `
-              <div class="mb-4">
-                <p class="text-sm font-semibold text-gray-700 mb-1">Farm Image:</p>
-                <img src="${imageUrl}" alt="Farm Image" class="w-36 h-36 object-cover rounded-lg border border-gray-200 shadow-sm">
-              </div>
-            ` : ''}
-            
-            <!-- File/Photo Links -->
-            <div class="mt-4 pt-4 border-t border-gray-100 flex flex-wrap gap-4 text-sm">
-              ${imageUrl ? `<a href="${imageUrl}" target="_blank" class="bg-indigo-50 text-indigo-700 font-medium px-4 py-2 rounded-full hover:bg-indigo-100 transition">Farm Image බලන්න →</a>` : ''}
-              ${getFieldValue(item, ['Semen deposit photo', 'Semen_deposit_photo']) ? `<a href="${getFieldValue(item, ['Semen deposit photo', 'Semen_deposit_photo'])}" target="_blank" class="bg-blue-50 text-blue-700 font-medium px-4 py-2 rounded-full hover:bg-blue-100 transition">Semen Deposit Photo බලන්න →</a>` : ''}
-              ${getFieldValue(item, ['pdf', 'PDF']) ? `<a href="${getFieldValue(item, ['pdf', 'PDF'])}" target="_blank" class="bg-green-50 text-green-700 font-medium px-4 py-2 rounded-full hover:bg-green-100 transition">PDF Document එක බලන්න →</a>` : ''}
-            </div>
-          </div>
-        `;
-        container.innerHTML += card;
-      });
-    }
-
-    function resetResultsIfEmpty() {
-      document.getElementById('resultsContainer').innerHTML = `
-        <div class="text-center p-16 bg-white rounded-xl shadow-inner text-gray-500">
-          <img src="https://img.icons8.com/isometric/100/search-property.png" alt="Search Property Icon" class="mx-auto mb-4"/>
-          ඉහත කොටුවට ගොවිමහතාගේ නම (Name of Farmer) ටයිප් කරන්න හෝ තෝරන්න.
-        </div>
-      `;
-    }
-
-    function resetSearch() {
-      document.getElementById('farmerNameInput').value = "";
-      resetResultsIfEmpty();
-    }
-
-    loadData();
-  </script>
-</body>
-</html>
+            <!-- Header Banner Section (Dark Blue Gradient) -->
+            <div
