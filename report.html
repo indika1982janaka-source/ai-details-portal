@@ -44,13 +44,13 @@
     
     <!-- Search Section with Single Farmer Name Input -->
     <div class="bg-white p-6 rounded-xl shadow-sm mb-8">
-      <h2 class="text-lg font-semibold text-gray-700 mb-4">ගොවිමහතාගේ නම (Name of Farmer) ඇතුළත් කරන්න හෝ තෝරන්න</h2>
+      <h2 class="text-lg font-semibold text-gray-700 mb-4">ගොවිමහතාගේ නම (Name of Farmer) තෝරන්න හෝ සෘජුවම ටයිප් කරන්න</h2>
       
       <div class="grid grid-cols-1 md:grid-cols-1 gap-4 mb-4">
-        <!-- Farmer Name Input with Datalist -->
+        <!-- Farmer Name Input with Datalist for Dropdown & Direct Typing -->
         <div>
           <label class="block text-sm font-medium text-gray-600 mb-1">ගොවිමහතාගේ නම (Name of Farmer):</label>
-          <input type="text" id="farmerNameInput" list="farmerNameOptions" placeholder="ගොවිමහතාගේ නම ටයිප් කරන්න..." oninput="onFarmerNameInput()" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white">
+          <input type="text" id="farmerNameInput" list="farmerNameOptions" placeholder="නම ටයිප් කරන්න හෝ ඩ්‍රොප්ඩවුන් එකෙන් තෝරන්න..." oninput="onFarmerNameInput()" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white" autocomplete="off">
           <datalist id="farmerNameOptions">
             <!-- JavaScript හරහා දත්ත මෙහි පිරවේ -->
           </datalist>
@@ -75,7 +75,7 @@
     <div id="resultsContainer" class="space-y-6">
       <div class="text-center p-16 bg-white rounded-xl shadow-inner text-gray-500">
         <img src="https://img.icons8.com/isometric/100/search-property.png" alt="Search Property Icon" class="mx-auto mb-4"/>
-        ඉහත කොටුවට ගොවිමහතාගේ නම (Name of Farmer) ඇතුළත් කරන්න.
+        ඉහත කොටුවට ගොවිමහතාගේ නම (Name of Farmer) ටයිප් කරන්න හෝ තෝරන්න.
       </div>
     </div>
 
@@ -190,7 +190,13 @@
 
         const farmerName = getFieldValue(item, ['Famer_Name', 'Famer Name', 'famer_name', 'famername', 'Farmer_Name', 'Farmer Name', 'Name of Farmer', 'name_of_farmer']);
         const address = getFieldValue(item, ['Address', 'address']);
-        const contactNo = getFieldValue(item, ['Contact_no', 'Contact No', 'contact_no', 'phone']);
+        const contactNo = getFieldValue(item, ['Contact_no', 'Contact No', 'contact_no', 'phone', 'Contact no']);
+        const ldiRange = getFieldValue(item, ['LDI_Range', 'LDI Range', 'ldi_range', 'LDI Range']);
+        const gnDivision = getFieldValue(item, ['G_N_Division', 'G/N Division', 'GN Division', 'gn_division', 'G/N Division']);
+        const totalCattles = getFieldValue(item, ['Total_No_of_Cattles', 'Total No of Cattles', 'total_no_of_cattles', 'Total No of Cattles']);
+        const totalMp = getFieldValue(item, ['Total_MP', 'Total MP', 'total_mp', 'Total MP']);
+        const descriptions = getFieldValue(item, ['Descriptions', 'descriptions', 'Description']);
+        const imageUrl = getFieldValue(item, ['Image', 'image', 'Farm_Image', 'Farm Image']);
         
         const card = `
           <div class="data-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-4">
@@ -199,28 +205,34 @@
                 <h2 class="text-2xl font-bold text-blue-900">${farmerName || '-'}</h2>
                 <p class="text-lg text-gray-600 mt-1">Farm ID: <span class="font-semibold text-gray-800">${farmId}</span></p>
               </div>
-              <div class="text-left md:text-right text-gray-600 bg-gray-50 p-3 rounded-lg border border-gray-100">
+              <div class="text-left md:text-right text-gray-600 bg-gray-50 p-3 rounded-lg border border-gray-100 text-sm">
                 <p><strong>Address:</strong> ${address || '-'}</p>
                 <p><strong>Contact no:</strong> ${contactNo || '-'}</p>
+                <p><strong>LDI Range:</strong> ${ldiRange || '-'}</p>
+                <p><strong>G/N Division:</strong> ${gnDivision || '-'}</p>
               </div>
             </div>
 
-            <!-- Detailed Grid -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-3 text-sm">
-              <p><strong>Date:</strong> ${getFieldValue(item, ['Date', 'date']) || '-'}</p>
-              <p><strong>Cow ID:</strong> ${getFieldValue(item, ['Cow_ID', 'Cow ID', 'cow_id']) || '-'}</p>
-              <p><strong>No of calving:</strong> ${getFieldValue(item, ['No_of_calving', 'No of calving', 'no_of_calving']) || '-'}</p>
-              <p><strong>Calving Date 1:</strong> ${getFieldValue(item, ['Calving_Date_1', 'Calving Date 1', 'calving_date_1']) || '-'}</p>
-              <p><strong>Milk Production:</strong> ${getFieldValue(item, ['Milk_Production', 'Milk Production', 'Milk Prouction', 'milk_production']) || '-'} L</p>
-              <p><strong>Semen code:</strong> ${getFieldValue(item, ['Semen_code', 'Semen Code', 'semen_code']) || '-'}</p>
-              <p><strong>Receipt no:</strong> ${getFieldValue(item, ['Receipt_no', 'Receipt No', 'Reeipt no', 'receipt_no']) || '-'}</p>
-              <p><strong>Date to be calved:</strong> ${getFieldValue(item, ['Date_to_be_calved', 'Date to be calved', 'date_to_be_calved']) || '-'}</p>
+            <!-- Detailed Grid for Melsiripura LDI Fields -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-x-6 gap-y-3 text-sm mb-4">
+              <p><strong>Total No of Cattles:</strong> ${totalCattles || '-'}</p>
+              <p><strong>Total MP:</strong> ${totalMp || '-'} L</p>
+              <p><strong>Descriptions:</strong> ${descriptions || '-'}</p>
             </div>
+
+            <!-- Farm Image Preview if available -->
+            ${imageUrl ? `
+              <div class="mb-4">
+                <p class="text-sm font-semibold text-gray-700 mb-1">Farm Image:</p>
+                <img src="${imageUrl}" alt="Farm Image" class="w-32 h-32 object-cover rounded-lg border border-gray-200 shadow-sm">
+              </div>
+            ` : ''}
             
             <!-- File/Photo Links -->
             <div class="mt-6 pt-4 border-t border-gray-100 flex flex-wrap gap-4 text-sm">
+              ${imageUrl ? `<a href="${imageUrl}" target="_blank" class="bg-indigo-50 text-indigo-700 font-medium px-4 py-2 rounded-full hover:bg-indigo-100 transition">Farm Image බලන්න →</a>` : ''}
               ${getFieldValue(item, ['Semen_deposit_photo', 'Semen Deposit Photo', 'semen_deposit_photo']) ? `<a href="${getFieldValue(item, ['Semen_deposit_photo', 'Semen Deposit Photo', 'semen_deposit_photo'])}" target="_blank" class="bg-blue-50 text-blue-700 font-medium px-4 py-2 rounded-full hover:bg-blue-100 transition">Semen Deposit Photo බලන්න →</a>` : ''}
-              ${getFieldValue(item, ['pdf', 'PDF']) ? `<a href="${getFieldValue(item, ['pdf', 'PDF'])}" target="_blank" class="bg-green-50 text-green-700 font-medium px-4 py-2 rounded-full hover:bg-green-100 transition">PDF Document එක බලන්න →</a>` : ''}
+              ${getFieldValue(item, ['pdf', 'PDF']) ? `<a href="${getFieldValue(item, ['pdf', 'PDF'])} " target="_blank" class="bg-green-50 text-green-700 font-medium px-4 py-2 rounded-full hover:bg-green-100 transition">PDF Document එක බලන්න →</a>` : ''}
             </div>
           </div>
         `;
@@ -232,7 +244,7 @@
       document.getElementById('resultsContainer').innerHTML = `
         <div class="text-center p-16 bg-white rounded-xl shadow-inner text-gray-500">
           <img src="https://img.icons8.com/isometric/100/search-property.png" alt="Search Property Icon" class="mx-auto mb-4"/>
-          ඉහත කොටුවට ගොවිමහතාගේ නම (Name of Farmer) ඇතුළත් කරන්න.
+          ඉහත කොටුවට ගොවිමහතාගේ නම (Name of Farmer) ටයිප් කරන්න හෝ තෝරන්න.
         </div>
       `;
     }
