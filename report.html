@@ -114,10 +114,19 @@
       }
     }
 
-    function getFieldValue(item, keys) {
-      for (let key of keys) {
-        if (item[key] !== undefined && item[key] !== null && item[key] !== '') {
-          return item[key];
+    // ඕනෑම අක්ෂර වෙනස්කමක්/හිස්තැනක් නොසලකා හැර දත්ත නිවැරදිව ලබාගන්නා උසස් Function එක
+    function getFieldValue(item, targetKeys) {
+      const itemKeys = Object.keys(item);
+      for (let targetKey of targetKeys) {
+        const cleanTarget = targetKey.toLowerCase().replace(/[^a-z0-9]/g, '');
+        for (let key of itemKeys) {
+          const cleanKey = key.toLowerCase().replace(/[^a-z0-9]/g, '');
+          if (cleanKey === cleanTarget) {
+            const val = item[key];
+            if (val !== undefined && val !== null && val !== '') {
+              return val;
+            }
+          }
         }
       }
       return '';
@@ -131,7 +140,7 @@
       let farmerNamesSet = new Set();
 
       farmData.forEach(item => {
-        const farmerName = getFieldValue(item, ['Famer_Name', 'Famer Name', 'famer_name', 'famername', 'Farmer_Name', 'Farmer Name', 'Name of Farmer', 'name_of_farmer']);
+        const farmerName = getFieldValue(item, ['Famer_Name', 'Famer Name', 'Farmer_Name', 'Farmer Name', 'Name of Farmer', 'name_of_farmer']);
         if (farmerName) farmerNamesSet.add(farmerName.toString().trim());
       });      
 
@@ -168,7 +177,7 @@
       const cleanedQuery = cleanString(query);
 
       const filtered = farmData.filter(item => {
-        const farmerName = getFieldValue(item, ['Famer_Name', 'Famer Name', 'famer_name', 'famername', 'Farmer_Name', 'Farmer Name', 'Name of Farmer', 'name_of_farmer']);
+        const farmerName = getFieldValue(item, ['Famer_Name', 'Famer Name', 'Farmer_Name', 'Farmer Name', 'Name of Farmer', 'name_of_farmer']);
         const cleanedFarmerName = cleanString(farmerName);
         
         return cleanedFarmerName.includes(cleanedQuery);
@@ -188,15 +197,18 @@
         const rawFarmId = getFieldValue(item, ['Farm_ID', 'Farm ID', 'farm_id', 'farmid']);
         const farmId = rawFarmId ? (rawFarmId.toString().startsWith('6130') ? rawFarmId : '6130' + rawFarmId) : '-';
 
-        const farmerName = getFieldValue(item, ['Famer_Name', 'Famer Name', 'famer_name', 'famername', 'Farmer_Name', 'Farmer Name', 'Name of Farmer', 'name_of_farmer']);
+        const farmerName = getFieldValue(item, ['Famer_Name', 'Famer Name', 'Farmer_Name', 'Farmer Name', 'Name of Farmer', 'name_of_farmer']);
         const address = getFieldValue(item, ['Address', 'address']);
-        const contactNo = getFieldValue(item, ['Contact_no', 'Contact No', 'contact_no', 'phone', 'Contact no']);
-        const ldiRange = getFieldValue(item, ['LDI_Range', 'LDI Range', 'ldi_range', 'LDI Range']);
-        const gnDivision = getFieldValue(item, ['G_N_Division', 'G/N Division', 'GN Division', 'gn_division', 'G/N Division']);
-        const totalCattles = getFieldValue(item, ['Total_No_of_Cattles', 'Total No of Cattles', 'total_no_of_cattles', 'Total No of Cattles']);
-        const totalMp = getFieldValue(item, ['Total_MP', 'Total MP', 'total_mp', 'Total MP']);
+        const contactNo = getFieldValue(item, ['Contact_no', 'Contact No', 'phone', 'Contact no']);
+        
+        // Google Sheet හි LDI Range සහ G/N Division තීරු කියවීම
+        const ldiRange = getFieldValue(item, ['LDI Range', 'LDI_Range', 'LDIRange', 'ldi range']);
+        const gnDivision = getFieldValue(item, ['G/N Division', 'G_N_Division', 'GN Division', 'G N Division', 'gn division']);
+        
+        const totalCattles = getFieldValue(item, ['Total No of Cattles', 'Total_No_of_Cattles', 'TotalNoOfCattles']);
+        const totalMp = getFieldValue(item, ['Total MP', 'Total_MP', 'TotalMP']);
         const descriptions = getFieldValue(item, ['Descriptions', 'descriptions', 'Description']);
-        const imageUrl = getFieldValue(item, ['Image', 'image', 'Farm_Image', 'Farm Image']);
+        const imageUrl = getFieldValue(item, ['Image', 'image', 'Farm Image', 'Farm_Image']);
         
         const card = `
           <div class="data-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-4">
@@ -231,8 +243,8 @@
             <!-- File/Photo Links -->
             <div class="mt-6 pt-4 border-t border-gray-100 flex flex-wrap gap-4 text-sm">
               ${imageUrl ? `<a href="${imageUrl}" target="_blank" class="bg-indigo-50 text-indigo-700 font-medium px-4 py-2 rounded-full hover:bg-indigo-100 transition">Farm Image බලන්න →</a>` : ''}
-              ${getFieldValue(item, ['Semen_deposit_photo', 'Semen Deposit Photo', 'semen_deposit_photo']) ? `<a href="${getFieldValue(item, ['Semen_deposit_photo', 'Semen Deposit Photo', 'semen_deposit_photo'])}" target="_blank" class="bg-blue-50 text-blue-700 font-medium px-4 py-2 rounded-full hover:bg-blue-100 transition">Semen Deposit Photo බලන්න →</a>` : ''}
-              ${getFieldValue(item, ['pdf', 'PDF']) ? `<a href="${getFieldValue(item, ['pdf', 'PDF'])} " target="_blank" class="bg-green-50 text-green-700 font-medium px-4 py-2 rounded-full hover:bg-green-100 transition">PDF Document එක බලන්න →</a>` : ''}
+              ${getFieldValue(item, ['Semen deposit photo', 'Semen_deposit_photo']) ? `<a href="${getFieldValue(item, ['Semen deposit photo', 'Semen_deposit_photo'])}" target="_blank" class="bg-blue-50 text-blue-700 font-medium px-4 py-2 rounded-full hover:bg-blue-100 transition">Semen Deposit Photo බලන්න →</a>` : ''}
+              ${getFieldValue(item, ['pdf', 'PDF']) ? `<a href="${getFieldValue(item, ['pdf', 'PDF'])}" target="_blank" class="bg-green-50 text-green-700 font-medium px-4 py-2 rounded-full hover:bg-green-100 transition">PDF Document එක බලන්න →</a>` : ''}
             </div>
           </div>
         `;
