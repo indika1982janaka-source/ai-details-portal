@@ -44,13 +44,13 @@
     
     <!-- Search Section with Single Farmer Name Input -->
     <div class="bg-white p-6 rounded-xl shadow-sm mb-8">
-      <h2 class="text-lg font-semibold text-gray-700 mb-4">ගොවිමහතාගේ නම (Name of Farmer) ටයිප් කරන්න හෝ ඩ්‍රොප්ඩවුන් එකෙන් තෝරන්න</h2>
+      <h2 class="text-lg font-semibold text-gray-700 mb-4">ගොවිමහතාගේ නම (Name of Farmer) ඩ්‍රොප්ඩවුන් එකෙන් තෝරන්න හෝ සෘජුවම ටයිප් කරන්න</h2>
       
       <div class="grid grid-cols-1 md:grid-cols-1 gap-4 mb-4">
         <!-- Farmer Name Input with Datalist for Dropdown & Direct Typing -->
         <div>
           <label class="block text-sm font-medium text-gray-600 mb-1">ගොවිමහතාගේ නම (Name of Farmer):</label>
-          <input type="text" id="farmerNameInput" list="farmerNameOptions" placeholder="නමේ කොටසක් ටයිප් කරන්න හෝ ඩ්‍රොප්ඩවුන් එකෙන් තෝරන්න..." oninput="onFarmerNameInput()" onchange="onFarmerNameInput()" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white" autocomplete="off">
+          <input type="text" id="farmerNameInput" list="farmerNameOptions" placeholder="නම ටයිප් කරන්න හෝ ඩ්‍රොප්ඩවුන් එකෙන් තෝරන්න..." oninput="onFarmerNameInput()" onchange="onFarmerNameInput()" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white" autocomplete="off">
           <datalist id="farmerNameOptions">
             <!-- JavaScript හරහා දත්ත මෙහි පිරවේ -->
           </datalist>
@@ -133,7 +133,7 @@
       return '';
     }
 
-    // Datalist වලට ගොවි නම පිරවීම
+    // Datalist වලට ගොවි නම පිරවීම (සිංහල අක්ෂර මාලාවේ පිළිවෙළට Sort කිරීම සමඟ)
     function populateDatalists() {
       const farmerNameList = document.getElementById('farmerNameOptions');
       farmerNameList.innerHTML = '';
@@ -312,3 +312,9 @@
     function resetSearch() {
       document.getElementById('farmerNameInput').value = "";
       resetResultsIfEmpty();
+    }
+
+    loadData();
+  </script>
+</body>
+</html>
