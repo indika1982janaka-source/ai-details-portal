@@ -100,6 +100,9 @@
         const res = await fetch(API_URL);
         farmData = await res.json();
         console.log("Loaded Farm Data successfully:", farmData);
+        if(farmData.length > 0) {
+          console.log("Keys available in first row of Google Sheet:", Object.keys(farmData[0]));
+        }
         populateDatalists();
       } catch (error) {
         console.error("Error loading data:", error);
@@ -114,12 +117,15 @@
       }
     }
 
-    // ඕනෑම අක්ෂර වෙනස්කමක්/හිස්තැනක් නොසලකා හැර දත්ත නිවැරදිව ලබාගන්නා උසස් Function එක
+    // ඉතාමත් උසස් ලෙස අක්ෂර හිස්තැන් සහ සංකේත නොසලකා හැර දත්ත ගැලපීමේ Function එක
     function getFieldValue(item, targetKeys) {
       if (!item) return '';
       const itemKeys = Object.keys(item);
+      
       for (let targetKey of targetKeys) {
+        // සියලුම special characters, spaces සහ underscores ඉවත් කර lowercase කිරීම
         const cleanTarget = targetKey.toLowerCase().replace(/[^a-z0-9]/g, '');
+        
         for (let key of itemKeys) {
           const cleanKey = key.toLowerCase().replace(/[^a-z0-9]/g, '');
           if (cleanKey === cleanTarget) {
@@ -203,18 +209,19 @@
         const address = getFieldValue(item, ['Address', 'address']);
         const contactNo = getFieldValue(item, ['Contact_no', 'Contact No', 'phone', 'Contact no', 'contact_no']);
         
-        const ldiRange = getFieldValue(item, ['LDI Range', 'LDI_Range', 'LDIRange', 'ldi range']);
-        const gnDivision = getFieldValue(item, ['G/N Division', 'G_N_Division', 'GN Division', 'G N Division', 'gn division']);
+        // LDI Range & GN Division විවිධ Spelling අනුව පරීක්ෂා කිරීම
+        const ldiRange = getFieldValue(item, ['LDI Range', 'LDI_Range', 'LDIRange', 'ldi range', 'Range']);
+        const gnDivision = getFieldValue(item, ['G/N Division', 'G_N_Division', 'GN Division', 'G N Division', 'gn division', 'GNDivision', 'GN']);
         
-        // Cattle & Milk Info
-        const totalCattles = getFieldValue(item, ['Total No of Cattles', 'Total_No_of_Cattles', 'TotalNoOfCattles']);
-        const totalMp = getFieldValue(item, ['Total MP', 'Total_MP', 'TotalMP']);
-        const cattleShed = getFieldValue(item, ['Cattle Shed', 'Cattle_Shed', 'cattleshed']);
+        // Cattle & Milk Info (විවිධ Variations සමඟ)
+        const totalCattles = getFieldValue(item, ['Total No of Cattles', 'Total_No_of_Cattles', 'TotalNoOfCattles', 'Total Cattles', 'Cattles']);
+        const totalMp = getFieldValue(item, ['Total MP', 'Total_MP', 'TotalMP', 'MP', 'Milk Production']);
+        const cattleShed = getFieldValue(item, ['Cattle Shed', 'Cattle_Shed', 'cattleshed', 'Shed']);
         
         // Fodder / Grass Info
-        const cultivatedGrass = getFieldValue(item, ['Cultivated grass (prch)', 'Cultivated grass', 'Cultivated_grass_prch', 'Cultivated_grass']);
-        const typeOfGrass = getFieldValue(item, ['Type of Grass', 'Type_of_Grass', 'TypeOfGrass']);
-        const tmrFeeding = getFieldValue(item, ['TMR feeding', 'TMR_feeding', 'TMR']);
+        const cultivatedGrass = getFieldValue(item, ['Cultivated grass (prch)', 'Cultivated grass', 'Cultivated_grass_prch', 'Cultivated_grass', 'Grass prch']);
+        const typeOfGrass = getFieldValue(item, ['Type of Grass', 'Type_of_Grass', 'TypeOfGrass', 'Grass Type']);
+        const tmrFeeding = getFieldValue(item, ['TMR feeding', 'TMR_feeding', 'TMR', 'Feeding']);
         
         // Other Livestock Info
         const noOfGoats = getFieldValue(item, ['No of Goats', 'No_of_Goats', 'Goats']);
@@ -243,7 +250,8 @@
               <div class="text-left md:text-right text-gray-600 bg-gray-50 p-3 rounded-lg border border-gray-100 text-sm space-y-1">
                 <p><strong>Address:</strong> ${address || '-'}</p>
                 <p><strong>Contact no:</strong> ${contactNo || '-'}</p>
-                <p><strong>LDI Range:</strong> ${ldiRange || '-'} | <strong>G/N Division:</strong> ${gnDivision || '-'}</p>
+                <p><strong>LDI Range:</strong> ${ldiRange || '-'}</p>
+                <p><strong>G/N Division:</strong> ${gnDivision || '-'}</p>
               </div>
             </div>
 
