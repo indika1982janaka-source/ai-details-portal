@@ -101,7 +101,7 @@
         farmData = await res.json();
         console.log("Loaded Farm Data successfully:", farmData);
         if(farmData.length > 0) {
-          console.log("Keys available in first row of Google Sheet:", Object.keys(farmData[0]));
+          console.log("Sheet Headers/Keys:", Object.keys(farmData[0]));
         }
         populateDatalists();
       } catch (error) {
@@ -117,13 +117,12 @@
       }
     }
 
-    // ඉතාමත් උසස් ලෙස අක්ෂර හිස්තැන් සහ සංකේත නොසලකා හැර දත්ත ගැලපීමේ Function එක
+    // හිස්තැන්, සංකේත සහ කැපිටල්/සිම්පල් අක්ෂර නොසලකා හැර නිවැරදි Field එක ලබාගන්නා Function එක
     function getFieldValue(item, targetKeys) {
       if (!item) return '';
       const itemKeys = Object.keys(item);
       
       for (let targetKey of targetKeys) {
-        // සියලුම special characters, spaces සහ underscores ඉවත් කර lowercase කිරීම
         const cleanTarget = targetKey.toLowerCase().replace(/[^a-z0-9]/g, '');
         
         for (let key of itemKeys) {
@@ -139,7 +138,7 @@
       return '';
     }
 
-    // Datalist වලට ගොවි නම පිරවීම (සිංහල අක්ෂර මාලාවේ පිළිවෙළට Sort කිරීම සමඟ)
+    // Datalist වලට ගොවි නම පිරවීම
     function populateDatalists() {
       const farmerNameList = document.getElementById('farmerNameOptions');
       farmerNameList.innerHTML = '';
@@ -147,7 +146,7 @@
       let farmerNamesSet = new Set();
 
       farmData.forEach(item => {
-        const farmerName = getFieldValue(item, ['Famer_Name', 'Famer Name', 'Farmer_Name', 'Farmer Name', 'Name of Farmer', 'name_of_farmer']);
+        const farmerName = getFieldValue(item, ['Famer_Name', 'Famer Name', 'Farmer_Name', 'Farmer Name', 'Name of Farmer', 'name_of_farmer', 'FarmerName']);
         if (farmerName) farmerNamesSet.add(farmerName.toString().trim());
       });     
 
@@ -184,7 +183,7 @@
       const cleanedQuery = cleanString(query);
 
       const filtered = farmData.filter(item => {
-        const farmerName = getFieldValue(item, ['Famer_Name', 'Famer Name', 'Farmer_Name', 'Farmer Name', 'Name of Farmer', 'name_of_farmer']);
+        const farmerName = getFieldValue(item, ['Famer_Name', 'Famer Name', 'Farmer_Name', 'Farmer Name', 'Name of Farmer', 'name_of_farmer', 'FarmerName']);
         const cleanedFarmerName = cleanString(farmerName);
         return cleanedFarmerName.includes(cleanedQuery);
       });
@@ -204,23 +203,23 @@
         const rawFarmId = getFieldValue(item, ['Farm_ID', 'Farm ID', 'farm_id', 'farmid']);
         const farmId = rawFarmId ? (rawFarmId.toString().startsWith('6130') ? rawFarmId : '6130' + rawFarmId) : '-';
 
-        const farmerName = getFieldValue(item, ['Famer_Name', 'Famer Name', 'Farmer_Name', 'Farmer Name', 'Name of Farmer', 'name_of_farmer']);
+        const farmerName = getFieldValue(item, ['Famer_Name', 'Famer Name', 'Farmer_Name', 'Farmer Name', 'Name of Farmer', 'name_of_farmer', 'FarmerName']);
         const farmType = getFieldValue(item, ['Farm Type', 'Farm_Type', 'farmtype', 'farm_type']);
         const address = getFieldValue(item, ['Address', 'address']);
-        const contactNo = getFieldValue(item, ['Contact_no', 'Contact No', 'phone', 'Contact no', 'contact_no']);
+        const contactNo = getFieldValue(item, ['Contact_no', 'Contact No', 'phone', 'Contact no', 'contact_no', 'Mobile']);
         
-        // LDI Range & GN Division විවිධ Spelling අනුව පරීක්ෂා කිරීම
-        const ldiRange = getFieldValue(item, ['LDI Range', 'LDI_Range', 'LDIRange', 'ldi range', 'Range']);
-        const gnDivision = getFieldValue(item, ['G/N Division', 'G_N_Division', 'GN Division', 'G N Division', 'gn division', 'GNDivision', 'GN']);
+        // LDI Range & GN Division ලබාගැනීම
+        const ldiRange = getFieldValue(item, ['LDI Range', 'LDI_Range', 'LDIRange', 'ldi range', 'Range', 'LDI']);
+        const gnDivision = getFieldValue(item, ['G/N Division', 'G_N_Division', 'GN Division', 'G N Division', 'gn division', 'GNDivision', 'GN_Division', 'GN', 'Gramadhari']);
         
-        // Cattle & Milk Info (විවිධ Variations සමඟ)
-        const totalCattles = getFieldValue(item, ['Total No of Cattles', 'Total_No_of_Cattles', 'TotalNoOfCattles', 'Total Cattles', 'Cattles']);
-        const totalMp = getFieldValue(item, ['Total MP', 'Total_MP', 'TotalMP', 'MP', 'Milk Production']);
+        // Cattle & Milk Info
+        const totalCattles = getFieldValue(item, ['Total No of Cattles', 'Total_No_of_Cattles', 'TotalNoOfCattles', 'Total Cattles', 'Cattles', 'CattleCount']);
+        const totalMp = getFieldValue(item, ['Total MP', 'Total_MP', 'TotalMP', 'MP', 'Milk Production', 'MilkYield']);
         const cattleShed = getFieldValue(item, ['Cattle Shed', 'Cattle_Shed', 'cattleshed', 'Shed']);
         
         // Fodder / Grass Info
-        const cultivatedGrass = getFieldValue(item, ['Cultivated grass (prch)', 'Cultivated grass', 'Cultivated_grass_prch', 'Cultivated_grass', 'Grass prch']);
-        const typeOfGrass = getFieldValue(item, ['Type of Grass', 'Type_of_Grass', 'TypeOfGrass', 'Grass Type']);
+        const cultivatedGrass = getFieldValue(item, ['Cultivated grass (prch)', 'Cultivated grass', 'Cultivated_grass_prch', 'Cultivated_grass', 'Grass prch', 'GrassPurches']);
+        const typeOfGrass = getFieldValue(item, ['Type of Grass', 'Type_of_Grass', 'TypeOfGrass', 'Grass Type', 'GrassVariety']);
         const tmrFeeding = getFieldValue(item, ['TMR feeding', 'TMR_feeding', 'TMR', 'Feeding']);
         
         // Other Livestock Info
@@ -232,8 +231,8 @@
         const noOfOtherSpecies = getFieldValue(item, ['No of Other Species', 'No_of_Other_Species', 'Other Species']);
         
         // Additional Info
-        const descriptions = getFieldValue(item, ['Descriptions', 'descriptions', 'Description']);
-        const imageUrl = getFieldValue(item, ['Image', 'image', 'Farm Image', 'Farm_Image']);
+        const descriptions = getFieldValue(item, ['Descriptions', 'descriptions', 'Description', 'Notes']);
+        const imageUrl = getFieldValue(item, ['Image', 'image', 'Farm Image', 'Farm_Image', 'Photo']);
         
         const card = `
           <div class="data-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-6">
@@ -262,7 +261,7 @@
                 <p><strong>Total No of Cattles:</strong> ${totalCattles || '-'}</p>
                 <p><strong>Total MP:</strong> ${totalMp ? totalMp + ' L' : '-'}</p>
                 <p><strong>Cattle Shed:</strong> ${cattleShed || '-'}</p>
-                <p><strong>Cultivated grass:</strong> ${cultivatedGrass ? cultivatedGrass + ' prch' : '-'}</p>
+                <p><strong>Cultivated grass:</strong> ${cultivatedGrass ? (cultivatedGrass.toString().includes('prch') ? cultivatedGrass : cultivatedGrass + ' prch') : '-'}</p>
                 <p><strong>Type of Grass:</strong> ${typeOfGrass || '-'}</p>
                 <p><strong>TMR feeding:</strong> ${tmrFeeding || '-'}</p>
               </div>
