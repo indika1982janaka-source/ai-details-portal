@@ -123,21 +123,40 @@
       }
     }
 
+    // Dynamic Key Search with Case-Insensitive Matching
     function getFieldValue(item, keys) {
+      if (!item) return '';
+      
+      // 1. Direct key match with given keys
       for (let key of keys) {
         if (item[key] !== undefined && item[key] !== null && item[key] !== '') {
           return item[key];
         }
       }
+      
+      // 2. Fallback: Case-insensitive and Space/Underscore insensitive search
+      const itemKeys = Object.keys(item);
+      for (let key of keys) {
+        const cleanKey = key.toLowerCase().replace(/[^a-z0-9]/g, '');
+        for (let actualKey of itemKeys) {
+          const cleanActualKey = actualKey.toLowerCase().replace(/[^a-z0-9]/g, '');
+          if (cleanKey === cleanActualKey) {
+            if (item[actualKey] !== undefined && item[actualKey] !== null && item[actualKey] !== '') {
+              return item[actualKey];
+            }
+          }
+        }
+      }
+      
       return '';
     }
 
-    // දිනය සාමාන්‍ය කියවිය හැකි ආකෘතියකට හරවන Function එක
+    // Safe Date Formatting
     function formatDate(dateString) {
       if (!dateString) return '-';
       try {
         const date = new Date(dateString);
-        if (isNaN(date.getTime())) return dateString;
+        if (isNaN(date.getTime())) return dateString; // Invalid date නම් තිබෙන ආකාරයටම පෙන්වයි
         return date.toLocaleDateString('si-LK', {
           year: 'numeric',
           month: 'long',
@@ -148,7 +167,7 @@
       }
     }
 
-    // Datalist වලට දත්ත පිරවීම (Farm ID පමණක් a-z / සංඛ්‍යාත්මක පිළිවෙළට සැකසීම)
+    // Datalist වලට දත්ත පිරවීම (Farm ID A-Z සැකසීම සමඟ)
     function populateDatalists() {
       const farmIdList = document.getElementById('farmIdOptions');
       const farmerNameList = document.getElementById('farmerNameOptions');
@@ -167,12 +186,10 @@
         if (farmerName) farmerNamesSet.add(farmerName.toString().trim());
       });     
 
-      // Farm ID පමණක් A-Z (Numeric & Alphabetical) පිළිවෙළට සැකසීම
       let sortedFarmIds = Array.from(farmIdsSet).sort((a, b) => 
         a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' })
       );
 
-      // ගොවිමහතාගේ නම සාමාන්‍ය ලෙස එකතු කිරීම
       let sortedFarmerNames = Array.from(farmerNamesSet).sort();
 
       sortedFarmIds.forEach(id => {
@@ -188,7 +205,6 @@
       });
     }
 
-    // Farm ID Input එක වෙනස් වන විට
     function onFarmIdInput() {
       const farmIdVal = document.getElementById('farmIdInput').value.trim();
       if (farmIdVal) {
@@ -208,7 +224,6 @@
       }
     }
 
-    // Farmer Name Input එක වෙනස් වන විට
     function onFarmerNameInput() {
       const farmerNameVal = document.getElementById('farmerNameInput').value.trim();
       if (farmerNameVal) {
@@ -228,7 +243,6 @@
       }
     }
 
-    // ප්‍රතිඵල පෙන්වන ප්‍රධාන Function එක
     function displayResults(type, query) {
       const container = document.getElementById('resultsContainer');
       container.innerHTML = '';
@@ -260,9 +274,25 @@
         const address = getFieldValue(item, ['Address', 'address']);
         const contactNo = getFieldValue(item, ['Contact_no', 'Contact No', 'contact_no', 'phone']);
         
+        // Extended Key Search for Milk Production, Receipt No & Date to be calved
+        const milkProd = getFieldValue(item, [
+          'Milk_Production', 'Milk Production', 'Milk Prouction', 'Milk_Prouction', 
+          'milk_production', 'milk_prouction', 'Milk', 'milk'
+        ]);
+
+        const receiptNo = getFieldValue(item, [
+          'Receipt_no', 'Receipt No', 'Reeipt no', 'Reeipt_no', 
+          'receipt_no', 'receipt_num', 'Receipt', 'receipt'
+        ]);
+
+        const rawDateToBeCalved = getFieldValue(item, [
+          'Date_to_be_calved', 'Date to be calved', 'date_to_be_calved', 
+          'Date_To_Be_Calved', 'Expected_Calving_Date', 'Calving_Due_Date'
+        ]);
+
         const formattedDate = formatDate(getFieldValue(item, ['Date', 'date']));
         const formattedCalvingDate = formatDate(getFieldValue(item, ['Calving_Date_1', 'Calving Date 1', 'calving_date_1']));
-        const formattedDateToBeCalved = formatDate(getFieldValue(item, ['Date_to_be_calved', 'Date to be calved', 'date_to_be_calved']));
+        const formattedDateToBeCalved = formatDate(rawDateToBeCalved);
 
         const card = `
           <div class="data-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-4">
@@ -282,10 +312,10 @@
               <p><strong>Cow ID:</strong> ${getFieldValue(item, ['Cow_ID', 'Cow ID', 'cow_id']) || '-'}</p>
               <p><strong>No of calving:</strong> ${getFieldValue(item, ['No_of_calving', 'No of calving', 'no_of_calving']) || '-'}</p>
               <p><strong>Calving Date 1:</strong> ${formattedCalvingDate}</p>
-              <p><strong>Milk Production:</strong> ${getFieldValue(item, ['Milk_Production', 'Milk Production', 'Milk Prouction', 'milk_production']) || '-'} L</p>
+              <p><strong>Milk Production:</strong> ${milkProd ? milkProd + ' L' : '-'}</p>
               <p><strong>Semen code:</strong> ${getFieldValue(item, ['Semen_code', 'Semen Code', 'semen_code']) || '-'}</p>
-              <p><strong>Receipt no:</strong> ${getFieldValue(item, ['Receipt_no', 'Receipt No', 'Reeipt no', 'receipt_no']) || '-'}</p>
-              <p><strong>Date to be calved:</strong> ${formattedDateToBeCalved}</p>
+              <p><strong>Receipt no:</strong> ${receiptNo || '-'}</p>
+              <p><strong>Date to be calved:</strong> ${formattedDateToBeCalved || '-'}</p>
             </div>
             
             <div class="mt-6 pt-4 border-t border-gray-100 flex flex-wrap gap-4 text-sm">
