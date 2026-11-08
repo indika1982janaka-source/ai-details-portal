@@ -37,6 +37,22 @@
     }
     @-webkit-keyframes spinner { 0% { -webkit-transform: rotate(0deg); } 100% { -webkit-transform: rotate(360deg); } }
     @keyframes spinner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    
+    /* Custom Scrollbar for Dropdown Menu */
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 8px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 8px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
   </style>
 </head>
 <body class="bg-blue-50/30 min-h-screen">
@@ -63,17 +79,39 @@
   <!-- Main Content Area -->
   <main class="max-w-7xl mx-auto p-6">
     
-    <!-- Search Section with Single Farmer Name Input -->
+    <!-- Search Section with Hybrid Custom Dropdown + Direct Typing -->
     <div class="bg-white p-6 rounded-2xl shadow-sm border border-blue-100 mb-8 transition hover:shadow-md">
       <h2 class="text-lg font-semibold text-blue-900 mb-4">ගොවිමහතාගේ නම (Name of Farmer) ඩ්‍රොප්ඩවුන් එකෙන් තෝරන්න හෝ සෘජුවම ටයිප් කරන්න</h2>
       
       <div class="grid grid-cols-1 md:grid-cols-1 gap-4 mb-4">
-        <div>
+        <!-- Relative Wrapper for Searchable Dropdown -->
+        <div class="relative" id="dropdownWrapper">
           <label class="block text-sm font-medium text-gray-700 mb-1">ගොවිමහතාගේ නම (Name of Farmer):</label>
-          <input type="text" id="farmerNameInput" list="farmerNameOptions" placeholder="නම ටයිප් කරන්න හෝ ඩ්‍රොප්ඩවුන් එකෙන් තෝරන්න..." oninput="onFarmerNameInput()" onchange="onFarmerNameInput()" class="w-full p-3 border border-blue-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent bg-blue-50/20 text-gray-800 transition" autocomplete="off">
-          <datalist id="farmerNameOptions">
-            <!-- JavaScript හරහා දත්ත මෙහි පිරවේ -->
-          </datalist>
+          
+          <div class="relative">
+            <input type="text" 
+                   id="farmerNameInput" 
+                   placeholder="නම ටයිප් කරන්න හෝ ඩ්‍රොප්ඩවුන් එකෙන් තෝරන්න..." 
+                   oninput="onFarmerNameInput()" 
+                   onfocus="showDropdown()" 
+                   class="w-full p-3 pr-10 border border-blue-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent bg-blue-50/20 text-gray-800 transition" 
+                   autocomplete="off">
+            
+            <!-- Dropdown Arrow Icon -->
+            <button type="button" 
+                    onclick="toggleDropdown()" 
+                    class="absolute right-3 top-1/2 -translate-y-1/2 text-blue-700 hover:text-blue-900 focus:outline-none p-1">
+              <svg class="w-5 h-5 transition-transform duration-200" id="dropdownArrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Custom Dropdown List -->
+          <div id="customDropdown" 
+               class="hidden absolute z-30 w-full mt-2 bg-white border border-blue-200 rounded-xl shadow-xl max-h-60 overflow-y-auto custom-scrollbar">
+            <!-- JavaScript හරහා Options මෙතැනට එකතු වේ -->
+          </div>
         </div>
       </div>
 
@@ -111,6 +149,7 @@
     // --- END CONFIGURATION ---
 
     let farmData = [];
+    let sortedFarmerNames = [];
 
     async function loadData() {
       const loading = document.getElementById('loadingIndicator');
@@ -123,7 +162,7 @@
         if(farmData.length > 0) {
           console.log("Sheet Headers/Keys:", Object.keys(farmData[0]));
         }
-        populateDatalists();
+        extractFarmerNames();
       } catch (error) {
         console.error("Error loading data:", error);
         document.getElementById('resultsContainer').innerHTML = `
@@ -157,10 +196,7 @@
       return '';
     }
 
-    function populateDatalists() {
-      const farmerNameList = document.getElementById('farmerNameOptions');
-      farmerNameList.innerHTML = '';
-      
+    function extractFarmerNames() {
       let farmerNamesSet = new Set();
 
       farmData.forEach(item => {
@@ -168,16 +204,64 @@
         if (farmerName) farmerNamesSet.add(farmerName.toString().trim());
       });     
 
-      let sortedFarmerNames = Array.from(farmerNamesSet).sort((a, b) => 
+      sortedFarmerNames = Array.from(farmerNamesSet).sort((a, b) => 
         a.localeCompare(b, 'si', { sensitivity: 'base' })
       );
 
-      sortedFarmerNames.forEach(name => {
-        let opt = document.createElement('option');
-        opt.value = name;
-        farmerNameList.appendChild(opt);
+      renderDropdownOptions(sortedFarmerNames);
+    }
+
+    function renderDropdownOptions(namesList) {
+      const dropdown = document.getElementById('customDropdown');
+      dropdown.innerHTML = '';
+
+      if (namesList.length === 0) {
+        dropdown.innerHTML = `<div class="p-3 text-sm text-gray-400 text-center">නමක් හමු නොවීය</div>`;
+        return;
+      }
+
+      namesList.forEach(name => {
+        const item = document.createElement('div');
+        item.className = 'p-3 text-sm text-gray-800 hover:bg-blue-100/70 cursor-pointer transition border-b border-gray-50 last:border-none font-medium';
+        item.innerText = name;
+        item.onclick = function() {
+          selectFarmer(name);
+        };
+        dropdown.appendChild(item);
       });
     }
+
+    function selectFarmer(name) {
+      document.getElementById('farmerNameInput').value = name;
+      hideDropdown();
+      displayResults(name);
+    }
+
+    function showDropdown() {
+      document.getElementById('customDropdown').classList.remove('hidden');
+    }
+
+    function hideDropdown() {
+      document.getElementById('customDropdown').classList.add('hidden');
+    }
+
+    function toggleDropdown() {
+      const dropdown = document.getElementById('customDropdown');
+      if (dropdown.classList.contains('hidden')) {
+        showDropdown();
+        document.getElementById('farmerNameInput').focus();
+      } else {
+        hideDropdown();
+      }
+    }
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(event) {
+      const wrapper = document.getElementById('dropdownWrapper');
+      if (wrapper && !wrapper.contains(event.target)) {
+        hideDropdown();
+      }
+    });
 
     function cleanString(str) {
       if (!str) return '';
@@ -185,9 +269,17 @@
     }
 
     function onFarmerNameInput() {
-      const farmerNameVal = document.getElementById('farmerNameInput').value;
-      if (farmerNameVal.trim() !== "") {
-        displayResults(farmerNameVal);
+      const inputVal = document.getElementById('farmerNameInput').value;
+      showDropdown();
+
+      // Filter dropdown items as user types
+      const filteredNames = sortedFarmerNames.filter(name => 
+        cleanString(name).includes(cleanString(inputVal))
+      );
+      renderDropdownOptions(filteredNames);
+
+      if (inputVal.trim() !== "") {
+        displayResults(inputVal);
       } else {
         resetResultsIfEmpty();
       }
@@ -255,4 +347,8 @@
           <div class="data-card bg-white rounded-2xl shadow-md border border-blue-100 overflow-hidden mb-6">
             
             <!-- Header Banner Section (Dark Blue Gradient) -->
-            <div
+            <div class="bg-gradient-to-r from-blue-900 via-blue-800 to-indigo-900 text-white p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div>
+                <h2 class="text-2xl md:text-3xl font-extrabold tracking-wide text-white drop-shadow-sm">${farmerName || '-'}</h2>
+                <div class="flex flex-wrap items-center gap-3 mt-2">
+                  <p class="text-sm bg-blue-950/60 text-blue-100 px-3 py-1 rounded-full border border-blue-700/50">Farm ID: <span class="font-bold text-white">${farmId}</span></p>
