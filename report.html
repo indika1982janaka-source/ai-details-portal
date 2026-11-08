@@ -133,7 +133,7 @@
       return '';
     }
 
-    // Datalist වලට ගොවි නම පිරවීම (සිංහල අක්ෂර මාලාවේ පිළිවෙලට Sort කිරීම සමඟ)
+    // Datalist වලට ගොවි නම පිරවීම
     function populateDatalists() {
       const farmerNameList = document.getElementById('farmerNameOptions');
       farmerNameList.innerHTML = '';
@@ -156,13 +156,11 @@
       });
     }
 
-    // උපකාරක function එක: අක්ෂරවල ඇති හිස්තැන් සහ අතිරේක සලකුණු පිරිසිදු කිරීමට
     function cleanString(str) {
       if (!str) return '';
       return str.toString().toLowerCase().replace(/\s+/g, ' ').trim();
     }
 
-    // Farmer Name Input එක වෙනස් වන විට
     function onFarmerNameInput() {
       const farmerNameVal = document.getElementById('farmerNameInput').value;
       if (farmerNameVal.trim() !== "") {
@@ -182,8 +180,6 @@
       const filtered = farmData.filter(item => {
         const farmerName = getFieldValue(item, ['Famer_Name', 'Famer Name', 'Farmer_Name', 'Farmer Name', 'Name of Farmer', 'name_of_farmer']);
         const cleanedFarmerName = cleanString(farmerName);
-        
-        // නමේ කොටසක් ටයිප් කළත් (Partial Match) සෙවීම සිදු කරයි
         return cleanedFarmerName.includes(cleanedQuery);
       });
 
@@ -198,54 +194,102 @@
       }
 
       filtered.forEach(item => {
+        // Basic Info
         const rawFarmId = getFieldValue(item, ['Farm_ID', 'Farm ID', 'farm_id', 'farmid']);
         const farmId = rawFarmId ? (rawFarmId.toString().startsWith('6130') ? rawFarmId : '6130' + rawFarmId) : '-';
 
         const farmerName = getFieldValue(item, ['Famer_Name', 'Famer Name', 'Farmer_Name', 'Farmer Name', 'Name of Farmer', 'name_of_farmer']);
+        const farmType = getFieldValue(item, ['Farm Type', 'Farm_Type', 'farmtype', 'farm_type']);
         const address = getFieldValue(item, ['Address', 'address']);
-        const contactNo = getFieldValue(item, ['Contact_no', 'Contact No', 'phone', 'Contact no']);
+        const contactNo = getFieldValue(item, ['Contact_no', 'Contact No', 'phone', 'Contact no', 'contact_no']);
         
-        // Google Sheet හි LDI Range සහ G/N Division තීරු කියවීම
         const ldiRange = getFieldValue(item, ['LDI Range', 'LDI_Range', 'LDIRange', 'ldi range']);
         const gnDivision = getFieldValue(item, ['G/N Division', 'G_N_Division', 'GN Division', 'G N Division', 'gn division']);
         
+        // Cattle & Milk Info
         const totalCattles = getFieldValue(item, ['Total No of Cattles', 'Total_No_of_Cattles', 'TotalNoOfCattles']);
         const totalMp = getFieldValue(item, ['Total MP', 'Total_MP', 'TotalMP']);
+        const cattleShed = getFieldValue(item, ['Cattle Shed', 'Cattle_Shed', 'cattleshed']);
+        
+        // Fodder / Grass Info
+        const cultivatedGrass = getFieldValue(item, ['Cultivated grass (prch)', 'Cultivated grass', 'Cultivated_grass_prch', 'Cultivated_grass']);
+        const typeOfGrass = getFieldValue(item, ['Type of Grass', 'Type_of_Grass', 'TypeOfGrass']);
+        const tmrFeeding = getFieldValue(item, ['TMR feeding', 'TMR_feeding', 'TMR']);
+        
+        // Other Livestock Info
+        const noOfGoats = getFieldValue(item, ['No of Goats', 'No_of_Goats', 'Goats']);
+        const noOfPigs = getFieldValue(item, ['No of Pigs', 'No_of_Pigs', 'Pigs']);
+        const noOfLayers = getFieldValue(item, ['No of Layers', 'No_of_Layers', 'Layers']);
+        const noOfBroilers = getFieldValue(item, ['No of Broilers', 'No_of_Broilers', 'Broilers']);
+        const noOfBackyards = getFieldValue(item, ['No of Backyards', 'No_of_Backyards', 'Backyards']);
+        const noOfOtherSpecies = getFieldValue(item, ['No of Other Species', 'No_of_Other_Species', 'Other Species']);
+        
+        // Additional Info
         const descriptions = getFieldValue(item, ['Descriptions', 'descriptions', 'Description']);
         const imageUrl = getFieldValue(item, ['Image', 'image', 'Farm Image', 'Farm_Image']);
         
         const card = `
-          <div class="data-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-4">
+          <div class="data-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-6">
+            
+            <!-- Header Banner Section -->
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4 border-b border-gray-200 pb-4">
               <div>
                 <h2 class="text-2xl font-bold text-blue-900">${farmerName || '-'}</h2>
-                <p class="text-lg text-gray-600 mt-1">Farm ID: <span class="font-semibold text-gray-800">${farmId}</span></p>
+                <div class="flex flex-wrap items-center gap-3 mt-1">
+                  <p class="text-base text-gray-700">Farm ID: <span class="font-semibold text-gray-900">${farmId}</span></p>
+                  ${farmType ? `<span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">${farmType}</span>` : ''}
+                </div>
               </div>
-              <div class="text-left md:text-right text-gray-600 bg-gray-50 p-3 rounded-lg border border-gray-100 text-sm">
+              <div class="text-left md:text-right text-gray-600 bg-gray-50 p-3 rounded-lg border border-gray-100 text-sm space-y-1">
                 <p><strong>Address:</strong> ${address || '-'}</p>
                 <p><strong>Contact no:</strong> ${contactNo || '-'}</p>
-                <p><strong>LDI Range:</strong> ${ldiRange || '-'}</p>
-                <p><strong>G/N Division:</strong> ${gnDivision || '-'}</p>
+                <p><strong>LDI Range:</strong> ${ldiRange || '-'} | <strong>G/N Division:</strong> ${gnDivision || '-'}</p>
               </div>
             </div>
 
-            <!-- Detailed Grid for Melsiripura LDI Fields -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-x-6 gap-y-3 text-sm mb-4">
-              <p><strong>Total No of Cattles:</strong> ${totalCattles || '-'}</p>
-              <p><strong>Total MP:</strong> ${totalMp || '-'} L</p>
-              <p><strong>Descriptions:</strong> ${descriptions || '-'}</p>
+            <!-- Cattle & Feed Management Section -->
+            <div class="mb-4">
+              <h3 class="text-sm font-bold text-blue-800 uppercase tracking-wider mb-2 border-b border-blue-100 pb-1">ගව පාලනය සහ තෘණ වගාව (Cattle & Feed Details)</h3>
+              <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 text-sm bg-blue-50/40 p-3 rounded-lg">
+                <p><strong>Total No of Cattles:</strong> ${totalCattles || '-'}</p>
+                <p><strong>Total MP:</strong> ${totalMp ? totalMp + ' L' : '-'}</p>
+                <p><strong>Cattle Shed:</strong> ${cattleShed || '-'}</p>
+                <p><strong>Cultivated grass:</strong> ${cultivatedGrass ? cultivatedGrass + ' prch' : '-'}</p>
+                <p><strong>Type of Grass:</strong> ${typeOfGrass || '-'}</p>
+                <p><strong>TMR feeding:</strong> ${tmrFeeding || '-'}</p>
+              </div>
             </div>
+
+            <!-- Other Livestock Section -->
+            <div class="mb-4">
+              <h3 class="text-sm font-bold text-green-800 uppercase tracking-wider mb-2 border-b border-green-100 pb-1">වෙනත් සතුන් සහ කුකුළු පාලනය (Other Livestock & Poultry)</h3>
+              <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 text-sm bg-green-50/40 p-3 rounded-lg">
+                <p><strong>Goats:</strong> ${noOfGoats || '0'}</p>
+                <p><strong>Pigs:</strong> ${noOfPigs || '0'}</p>
+                <p><strong>Layers:</strong> ${noOfLayers || '0'}</p>
+                <p><strong>Broilers:</strong> ${noOfBroilers || '0'}</p>
+                <p><strong>Backyards:</strong> ${noOfBackyards || '0'}</p>
+                <p><strong>Other Species:</strong> ${noOfOtherSpecies || '0'}</p>
+              </div>
+            </div>
+
+            <!-- Descriptions Section -->
+            ${descriptions ? `
+              <div class="mb-4 text-sm text-gray-700 bg-gray-50 p-3 rounded-lg border border-gray-100">
+                <p><strong>Descriptions / සටහන්:</strong> ${descriptions}</p>
+              </div>
+            ` : ''}
 
             <!-- Farm Image Preview if available -->
             ${imageUrl ? `
               <div class="mb-4">
                 <p class="text-sm font-semibold text-gray-700 mb-1">Farm Image:</p>
-                <img src="${imageUrl}" alt="Farm Image" class="w-32 h-32 object-cover rounded-lg border border-gray-200 shadow-sm">
+                <img src="${imageUrl}" alt="Farm Image" class="w-36 h-36 object-cover rounded-lg border border-gray-200 shadow-sm">
               </div>
             ` : ''}
             
             <!-- File/Photo Links -->
-            <div class="mt-6 pt-4 border-t border-gray-100 flex flex-wrap gap-4 text-sm">
+            <div class="mt-4 pt-4 border-t border-gray-100 flex flex-wrap gap-4 text-sm">
               ${imageUrl ? `<a href="${imageUrl}" target="_blank" class="bg-indigo-50 text-indigo-700 font-medium px-4 py-2 rounded-full hover:bg-indigo-100 transition">Farm Image බලන්න →</a>` : ''}
               ${getFieldValue(item, ['Semen deposit photo', 'Semen_deposit_photo']) ? `<a href="${getFieldValue(item, ['Semen deposit photo', 'Semen_deposit_photo'])}" target="_blank" class="bg-blue-50 text-blue-700 font-medium px-4 py-2 rounded-full hover:bg-blue-100 transition">Semen Deposit Photo බලන්න →</a>` : ''}
               ${getFieldValue(item, ['pdf', 'PDF']) ? `<a href="${getFieldValue(item, ['pdf', 'PDF'])}" target="_blank" class="bg-green-50 text-green-700 font-medium px-4 py-2 rounded-full hover:bg-green-100 transition">PDF Document එක බලන්න →</a>` : ''}
@@ -265,13 +309,6 @@
       `;
     }
 
-    // Reset කිරීම
     function resetSearch() {
       document.getElementById('farmerNameInput').value = "";
       resetResultsIfEmpty();
-    }
-
-    loadData();
-  </script>
-</body>
-</html>
