@@ -175,6 +175,9 @@
       if (!item) return '';
       
       for (let key of keys) {
+        // ආරක්ෂාව සඳහා Email හෝ email යන යතුරුවලින් දත්ත ලබා ගැනීම වැළැක්වීම
+        if (key.toLowerCase() === 'email') continue;
+
         if (item[key] !== undefined && item[key] !== null && item[key] !== '') {
           return item[key];
         }
@@ -182,8 +185,12 @@
       
       const itemKeys = Object.keys(item);
       for (let key of keys) {
+        if (key.toLowerCase() === 'email') continue;
+
         const cleanKey = key.toLowerCase().replace(/[^a-z0-9]/g, '');
         for (let actualKey of itemKeys) {
+          if (actualKey.toLowerCase() === 'email') continue;
+
           const cleanActualKey = actualKey.toLowerCase().replace(/[^a-z0-9]/g, '');
           if (cleanKey === cleanActualKey) {
             if (item[actualKey] !== undefined && item[actualKey] !== null && item[actualKey] !== '') {
