@@ -122,4 +122,172 @@
     <!-- Results Display Area -->
     <div id="resultsContainer" class="space-y-6">
       <div class="text-center p-16 bg-white/80 backdrop-blur-md rounded-2xl shadow-sm text-gray-400 border border-white">
-        <img src="
+        <img src="https://img.icons8.com/isometric/100/search-property.png" alt="Search Property Icon" class="mx-auto mb-4 opacity-70"/>
+        ඉහත කොටුවට ගොවිමහතාගේ නම (Name of Farmer) ටයිප් කරන්න හෝ තෝරන්න.
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="text-center p-6 text-gray-500 text-sm mt-12 border-t border-gray-300/60 bg-white/40 backdrop-blur-md">
+    © 2026 කෘත්‍රිම සිංචන තොරතුරු - ඉබ්බාගමුව පශු වෛද්‍ය කාර්යාලය. සියලු හිමිකම් ඇවිරිණි.
+  </footer>
+
+  <script>
+    // --- CONFIGURATION ---
+    const API_URL = "https://script.google.com/macros/s/AKfycbw1XSGoey4yFuvV_gMg37sQpOA3-YAseHX67FT8n-0clTmcxv-U6qFhCqPj6T17CTCS/exec"; 
+    // --- END CONFIGURATION ---
+
+    let farmData = [];
+
+    async function loadData() {
+      const loading = document.getElementById('loadingIndicator');
+      loading.classList.remove('hidden');
+      
+      try {
+        const res = await fetch(API_URL);
+        farmData = await res.json();
+        console.log("Loaded Farm Data successfully:", farmData);
+        populateDatalists();
+      } catch (error) {
+        console.error("Error loading data:", error);
+        document.getElementById('resultsContainer').innerHTML = `
+          <div class="text-center p-12 bg-red-50 text-red-600 rounded-2xl border border-red-200 shadow-sm">
+            <h3 class="font-bold text-lg mb-2">Error Connecting to Data Source</h3>
+            <p>ගූගල් ෂීට් එක සමඟ සම්බන්ධ වීමට නොහැකි විය. Web App URL එක පරීක්ෂා කරන්න.</p>
+          </div>
+        `;
+      } finally {
+        loading.classList.add('hidden');
+      }
+    }
+
+    function getFieldValue(item, targetKeys) {
+      if (!item) return '';
+      const itemKeys = Object.keys(item);
+      
+      for (let targetKey of targetKeys) {
+        if (targetKey.toLowerCase() === 'email') continue;
+        const cleanTarget = targetKey.toLowerCase().replace(/[^a-z0-9]/g, '');
+        
+        for (let key of itemKeys) {
+          if (key.toLowerCase() === 'email') continue;
+          const cleanKey = key.toLowerCase().replace(/[^a-z0-9]/g, '');
+          if (cleanKey === cleanTarget) {
+            const val = item[key];
+            if (val !== undefined && val !== null && val !== '') {
+              return val;
+            }
+          }
+        }
+      }
+      return '';
+    }
+
+    // Google Drive Image URLs <img> tag එකෙන් පෙනෙන ලෙස පරිවර්තනය කරන Function එක
+    function getDirectImageUrl(url) {
+      if (!url) return '';
+      if (url.includes('drive.google.com') && url.includes('id=')) {
+        const idMatch = url.match(/id=([a-zA-Z0-9_-]+)/);
+        if (idMatch && idMatch[1]) {
+          return `https://lh3.googleusercontent.com/d/${idMatch[1]}`; } } else if (url.includes('drive.google.com/file/d/')) { const idMatch = url.match(/\/d\/([a-zA-Z0-9_-]+)/); if (idMatch && idMatch[1]) { return `https://lh3.googleusercontent.com/d/${idMatch[1]}`;
+        }
+      }
+      return url;
+    }
+
+    function populateDatalists() {
+      const farmerNameList = document.getElementById('farmerNameOptions');
+      farmerNameList.innerHTML = '';
+      
+      let farmerNamesSet = new Set();
+
+      farmData.forEach(item => {
+        const farmerName = getFieldValue(item, ['Famer_Name', 'Famer Name', 'Farmer_Name', 'Farmer Name', 'Name of Farmer', 'name_of_farmer', 'FarmerName']);
+        if (farmerName) farmerNamesSet.add(farmerName.toString().trim());
+      });     
+
+      let sortedFarmerNames = Array.from(farmerNamesSet).sort((a, b) => 
+        a.localeCompare(b, 'si', { sensitivity: 'base' })
+      );
+
+      sortedFarmerNames.forEach(name => {
+        let opt = document.createElement('option');
+        opt.value = name;
+        farmerNameList.appendChild(opt);
+      });
+    }
+
+    function cleanString(str) {
+      if (!str) return '';
+      return str.toString().toLowerCase().replace(/\s+/g, ' ').trim();
+    }
+
+    function onFarmerNameInput() {
+      const farmerNameVal = document.getElementById('farmerNameInput').value;
+      if (farmerNameVal.trim() !== "") {
+        displayResults(farmerNameVal);
+      } else {
+        resetResultsIfEmpty();
+      }
+    }
+
+    function displayResults(query) {
+      const container = document.getElementById('resultsContainer');
+      container.innerHTML = '';
+
+      const cleanedQuery = cleanString(query);
+
+      const filtered = farmData.filter(item => {
+        const farmerName = getFieldValue(item, ['Famer_Name', 'Famer Name', 'Farmer_Name', 'Farmer Name', 'Name of Farmer', 'name_of_farmer', 'FarmerName']);
+        const cleanedFarmerName = cleanString(farmerName);
+        return cleanedFarmerName.includes(cleanedQuery);
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="text-center p-16 bg-white rounded-2xl shadow-sm text-red-500 border border-red-100">
+            <img src="https://img.icons8.com/isometric/100/delete-property.png" alt="Not Found Icon" class="mx-auto mb-4"/>
+            තොරතුරු හමු නොවීය.
+          </div>
+        `;
+        return;
+      }
+
+      filtered.forEach(item => {
+        const rawFarmId = getFieldValue(item, ['Farm_ID', 'Farm ID', 'farm_id', 'farmid']);
+        const farmId = rawFarmId ? (rawFarmId.toString().startsWith('6130') ? rawFarmId : '6130' + rawFarmId) : '-';
+
+        const farmerName = getFieldValue(item, ['Famer_Name', 'Famer Name', 'Farmer_Name', 'Farmer Name', 'Name of Farmer', 'name_of_farmer', 'FarmerName']);
+        const farmType = getFieldValue(item, ['Farm Type', 'Farm_Type', 'farmtype', 'farm_type']);
+        const address = getFieldValue(item, ['Address', 'address']);
+        const contactNo = getFieldValue(item, ['Contact_no', 'Contact No', 'phone', 'Contact no', 'contact_no', 'Mobile']);
+        
+        const ldiRange = getFieldValue(item, ['LDI Range', 'LDI_Range', 'LDIRange', 'ldi range', 'Range', 'LDI']);
+        const gnDivision = getFieldValue(item, ['G/N Division', 'G_N_Division', 'GN Division', 'G N Division', 'gn division', 'GNDivision', 'GN_Division', 'GN', 'Gramadhari']);
+        
+        const totalCattles = getFieldValue(item, ['Total No of Cattles', 'Total_No_of_Cattles', 'TotalNoOfCattles', 'Total Cattles', 'Cattles', 'CattleCount']);
+        const totalMp = getFieldValue(item, ['Total MP', 'Total_MP', 'TotalMP', 'MP', 'Milk Production', 'MilkYield']);
+        const cattleShed = getFieldValue(item, ['Cattle Shed', 'Cattle_Shed', 'cattleshed', 'Shed']);
+        
+        const cultivatedGrass = getFieldValue(item, ['Cultivated grass (prch)', 'Cultivated grass', 'Cultivated_grass_prch', 'Cultivated_grass', 'Grass prch', 'GrassPurches']);
+        const typeOfGrass = getFieldValue(item, ['Type of Grass', 'Type_of_Grass', 'TypeOfGrass', 'Grass Type', 'GrassVariety']);
+        const tmrFeeding = getFieldValue(item, ['TMR feeding', 'TMR_feeding', 'TMR', 'Feeding']);
+        
+        const noOfGoats = getFieldValue(item, ['No of Goats', 'No_of_Goats', 'Goats']);
+        const noOfPigs = getFieldValue(item, ['No of Pigs', 'No_of_Pigs', 'Pigs']);
+        const noOfLayers = getFieldValue(item, ['No of Layers', 'No_of_Layers', 'Layers']);
+        const noOfBroilers = getFieldValue(item, ['No of Broilers', 'No_of_Broilers', 'Broilers']);
+        const noOfBackyards = getFieldValue(item, ['No of Backyards', 'No_of_Backyards', 'Backyards']);
+        const noOfOtherSpecies = getFieldValue(item, ['No of Other Species', 'No_of_Other_Species', 'Other Species']);
+        
+        const descriptions = getFieldValue(item, ['Descriptions', 'descriptions', 'Description', 'Notes']);
+        
+        const rawImageUrl = getFieldValue(item, ['Image', 'image', 'Farm Image', 'Farm_Image', 'Photo']);
+        const directImageUrl = getDirectImageUrl(rawImageUrl);
+
+        const card = `
+          <div class="data-card bg-white p-6 rounded-2xl shadow-md border border-gray-100 mb-6">
+            
+            <!-- Header Banner Section with Farmer Photo on the Left -->
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4 border-b border-gray-100 pb-4
