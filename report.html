@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>කෘත්‍රිම සිංචන තොරතුරු-ඉබ්බාගමුව පශු වෛද්‍ය කාර්යාලය | AI Data Portal</title>
+  <title>ලියාපදිංචි ගොවිපල විස්තර (Registered Farm details) - ඉබ්බාගමුව පශු වෛද්‍ය කාර්යාලය</title>
   
   <!-- Tailwind CSS - Open Source UI Framework -->
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
@@ -32,8 +32,8 @@
 
       <!-- Navigation Menu Links -->
       <nav class="flex items-center gap-2 bg-gray-50 p-1.5 rounded-xl border border-gray-200">
-        <a href="index.html" class="bg-blue-600 text-white font-medium px-4 py-2 rounded-lg text-sm transition shadow-sm">කෘත්‍රිම සිංචන දත්ත</a>
-        <a href="report.html" class="text-gray-700 hover:bg-gray-200 font-medium px-4 py-2 rounded-lg text-sm transition">ලියාපදිංචි ගොවිපල විස්තර (Registered Farm details)</a>
+        <a href="index.html" class="text-gray-700 hover:bg-gray-200 font-medium px-4 py-2 rounded-lg text-sm transition">කෘත්‍රිම සිංචන දත්ත</a>
+        <a href="report.html" class="bg-blue-600 text-white font-medium px-4 py-2 rounded-lg text-sm transition shadow-sm">ලියාපදිංචි ගොවිපල විස්තර (Registered Farm details)</a>
       </nav>
 
     </div>
@@ -123,7 +123,7 @@
       return '';
     }
 
-    // Datalist වලට ගොවි නماء පිරවීම
+    // Datalist වලට ගොවි නම පිරවීම
     function populateDatalists() {
       const farmerNameList = document.getElementById('farmerNameOptions');
       farmerNameList.innerHTML = '';
@@ -160,7 +160,7 @@
       }
     }
 
-    // ප්‍රතිඵල පෙන්වන ප්‍රධාන Function එක (අක්ෂර/හිස්තැන් ගැටලු මඟහරවා ගනිමින් දැඩි සෙවුමක් සිදු කරයි)
+    // ප්‍රතිඵල පෙන්වන ප්‍රධාන Function එක
     function displayResults(query) {
       const container = document.getElementById('resultsContainer');
       container.innerHTML = '';
@@ -171,7 +171,6 @@
         const farmerName = getFieldValue(item, ['Famer_Name', 'Famer Name', 'famer_name', 'famername', 'Farmer_Name', 'Farmer Name', 'Name of Farmer', 'name_of_farmer']);
         const cleanedFarmerName = cleanString(farmerName);
         
-        // මෙහිදී ටයිප් කරන නම, ෂීට් එකේ ඇති නම තුළ අඩංගු දැයි (අර්ධ වශයෙන් හෝ සම්පූර්ණයෙන්) පරීක්ෂා කෙරේ
         return cleanedFarmerName.includes(cleanedQuery);
       });
 
@@ -186,7 +185,9 @@
       }
 
       filtered.forEach(item => {
-        const farmId = getFieldValue(item, ['Farm_ID', 'Farm ID', 'farm_id', 'farmid']);
+        const rawFarmId = getFieldValue(item, ['Farm_ID', 'Farm ID', 'farm_id', 'farmid']);
+        const farmId = rawFarmId ? (rawFarmId.toString().startsWith('6130') ? rawFarmId : '6130' + rawFarmId) : '-';
+
         const farmerName = getFieldValue(item, ['Famer_Name', 'Famer Name', 'famer_name', 'famername', 'Farmer_Name', 'Farmer Name', 'Name of Farmer', 'name_of_farmer']);
         const address = getFieldValue(item, ['Address', 'address']);
         const contactNo = getFieldValue(item, ['Contact_no', 'Contact No', 'contact_no', 'phone']);
@@ -196,7 +197,7 @@
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4 border-b border-gray-200 pb-4">
               <div>
                 <h2 class="text-2xl font-bold text-blue-900">${farmerName || '-'}</h2>
-                <p class="text-lg text-gray-600 mt-1">Farm ID: <span class="font-semibold text-gray-800">${farmId || '-'}</span></p>
+                <p class="text-lg text-gray-600 mt-1">Farm ID: <span class="font-semibold text-gray-800">${farmId}</span></p>
               </div>
               <div class="text-left md:text-right text-gray-600 bg-gray-50 p-3 rounded-lg border border-gray-100">
                 <p><strong>Address:</strong> ${address || '-'}</p>
@@ -209,7 +210,7 @@
               <p><strong>Date:</strong> ${getFieldValue(item, ['Date', 'date']) || '-'}</p>
               <p><strong>Cow ID:</strong> ${getFieldValue(item, ['Cow_ID', 'Cow ID', 'cow_id']) || '-'}</p>
               <p><strong>No of calving:</strong> ${getFieldValue(item, ['No_of_calving', 'No of calving', 'no_of_calving']) || '-'}</p>
-              <p><strong>Calving Date 1:</strong> සොයාගත නොහැකියි ${getFieldValue(item, ['Calving_Date_1', 'Calving Date 1', 'calving_date_1']) || '-'}</p>
+              <p><strong>Calving Date 1:</strong> ${getFieldValue(item, ['Calving_Date_1', 'Calving Date 1', 'calving_date_1']) || '-'}</p>
               <p><strong>Milk Production:</strong> ${getFieldValue(item, ['Milk_Production', 'Milk Production', 'Milk Prouction', 'milk_production']) || '-'} L</p>
               <p><strong>Semen code:</strong> ${getFieldValue(item, ['Semen_code', 'Semen Code', 'semen_code']) || '-'}</p>
               <p><strong>Receipt no:</strong> ${getFieldValue(item, ['Receipt_no', 'Receipt No', 'Reeipt no', 'receipt_no']) || '-'}</p>
@@ -218,7 +219,7 @@
             
             <!-- File/Photo Links -->
             <div class="mt-6 pt-4 border-t border-gray-100 flex flex-wrap gap-4 text-sm">
-              ${getFieldValue(item, ['Semen_deposit_photo', 'Semen Deposit Photo', 'semen_deposit_photo']) ? `<a href="${getFieldValue(item, ['Semen_deposit_photo', 'Semen Deposit Photo', 'semen_deposit_photo'])} " target="_blank" class="bg-blue-50 text-blue-700 font-medium px-4 py-2 rounded-full hover:bg-blue-100 transition">Semen Deposit Photo බලන්න →</a>` : ''}
+              ${getFieldValue(item, ['Semen_deposit_photo', 'Semen Deposit Photo', 'semen_deposit_photo']) ? `<a href="${getFieldValue(item, ['Semen_deposit_photo', 'Semen Deposit Photo', 'semen_deposit_photo'])}" target="_blank" class="bg-blue-50 text-blue-700 font-medium px-4 py-2 rounded-full hover:bg-blue-100 transition">Semen Deposit Photo බලන්න →</a>` : ''}
               ${getFieldValue(item, ['pdf', 'PDF']) ? `<a href="${getFieldValue(item, ['pdf', 'PDF'])}" target="_blank" class="bg-green-50 text-green-700 font-medium px-4 py-2 rounded-full hover:bg-green-100 transition">PDF Document එක බලන්න →</a>` : ''}
             </div>
           </div>
