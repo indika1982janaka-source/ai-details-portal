@@ -44,13 +44,13 @@
     
     <!-- Search Section with Two Typeable Inputs -->
     <div class="bg-white p-6 rounded-xl shadow-sm mb-8">
-      <h2 class="text-lg font-semibold text-gray-700 mb-4">ගොවිපල අංකය හෝ ගොවිමහතාගේ නම ටයිප් කරන්න හෝ තෝරන්න</h2>
+      <h2 class="text-lg font-semibold text-gray-700 mb-4">ගොවිපල අංකය හෝ ගොවිමහතාගේ නම සෘජුවම ටයිප් කරන්න</h2>
       
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
         <!-- Farm ID Input with Datalist -->
         <div>
           <label class="block text-sm font-medium text-gray-600 mb-1">ගොවිපල අංකය (Farm ID - 6130...):</label>
-          <input type="text" id="farmIdInput" list="farmIdOptions" placeholder="Farm ID එක ටයිප් කරන්න..." oninput="onFarmIdInput()" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white">
+          <input type="text" id="farmIdInput" list="farmIdOptions" placeholder="උදා: 6130 හෝ අංකය ටයිප් කරන්න..." oninput="onFarmIdInput()" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white" autocomplete="off">
           <datalist id="farmIdOptions">
             <!-- JavaScript හරහා දත්ත මෙහි පිරවේ -->
           </datalist>
@@ -59,7 +59,7 @@
         <!-- Farmer Name Input with Datalist -->
         <div>
           <label class="block text-sm font-medium text-gray-600 mb-1">ගොවිමහතාගේ නම (Farmer Name):</label>
-          <input type="text" id="farmerNameInput" list="farmerNameOptions" placeholder="නම ටයිප් කරන්න..." oninput="onFarmerNameInput()" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white">
+          <input type="text" id="farmerNameInput" list="farmerNameOptions" placeholder="නම ටයිප් කරන්න..." oninput="onFarmerNameInput()" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white" autocomplete="off">
           <datalist id="farmerNameOptions">
             <!-- JavaScript හරහා දත්ත මෙහි පිරවේ -->
           </datalist>
@@ -84,7 +84,7 @@
     <div id="resultsContainer" class="space-y-6">
       <div class="text-center p-16 bg-white rounded-xl shadow-inner text-gray-500">
         <img src="https://img.icons8.com/isometric/100/search-property.png" alt="Search Property Icon" class="mx-auto mb-4"/>
-        ඉහත කොටුවලට Farm ID එකක් හෝ ගොවිමහතාගේ නම ටයිප් කරන්න හෝ තෝරන්න.
+        ඉහත කොටුවලට Farm ID එකක් හෝ ගොවිමහතාගේ නම ටයිප් කරන්න.
       </div>
     </div>
 
@@ -167,7 +167,7 @@
       });
     }
 
-    // Farm ID Input එක වෙනස් වන විට
+    // Farm ID Input එක වෙනස් වන විට (Direct Type & Search)
     function onFarmIdInput() {
       const farmIdVal = document.getElementById('farmIdInput').value.trim();
       if (farmIdVal) {
@@ -187,7 +187,7 @@
       }
     }
 
-    // Farmer Name Input එක වෙනස් වන විට
+    // Farmer Name Input එක වෙනස් වන විට (Direct Type & Search)
     function onFarmerNameInput() {
       const farmerNameVal = document.getElementById('farmerNameInput').value.trim();
       if (farmerNameVal) {
@@ -207,7 +207,7 @@
       }
     }
 
-    // ප්‍රතිඵල පෙන්වන ප්‍රධාන Function එක (නම හෝ අංකය අර්ධ වශයෙන් ටයිප් කළද ක්‍රියාත්මක වීමට සකසා ඇත)
+    // ප්‍රතිඵල පෙන්වන ප්‍රධාන Function එක (අර්ධ වශයෙන් ටයිප් කළද ක්‍රියාත්මක වේ)
     function displayResults(type, query) {
       const container = document.getElementById('resultsContainer');
       container.innerHTML = '';
@@ -279,7 +279,7 @@
       document.getElementById('resultsContainer').innerHTML = `
         <div class="text-center p-16 bg-white rounded-xl shadow-inner text-gray-500">
           <img src="https://img.icons8.com/isometric/100/search-property.png" alt="Search Property Icon" class="mx-auto mb-4"/>
-          ඉහත කොටුවලට Farm ID එකක් හෝ ගොවිමහතාගේ නම ටයිප් කරන්න හෝ තෝරන්න.
+          ඉහත කොටුවලට Farm ID එකක් හෝ ගොවිමහතාගේ නම ටයිප් කරන්න.
         </div>
       `;
     }
